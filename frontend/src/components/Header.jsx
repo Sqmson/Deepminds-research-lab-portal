@@ -10,7 +10,7 @@ const Header = () => {
             {/* Site Icon */}
             <div className="w-10 h-10 rounded-lg flex items-center justify-center">
               <img 
-                className='w-11 h-11' 
+                className='w-10 h-10' 
                 fill="none" 
                 viewBox="0 0 24 24" 
                 stroke="currentColor" 
