@@ -14,7 +14,7 @@ const Header = () => {
                 fill="none" 
                 viewBox="0 0 24 24" 
                 stroke="currentColor" 
-                src="public/logo-7402580_1920.png" 
+                src="../../public/logo-7402580_1920.png" 
                 alt="site logo missing" 
               />
             </div>
