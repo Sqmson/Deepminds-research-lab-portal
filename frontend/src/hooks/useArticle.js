@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const useArticles = () => {
   const [articles, setArticles] = useState([]);
@@ -22,7 +23,7 @@ const useArticles = () => {
         limit: limit.toString(),
       });
 
-      const res = await fetch(`http://localhost:5000/articles?${query.toString()}`);
+      const res = await fetch(`${API_BASE_URL}/articles?${query.toString()}`);
       const text = await res.text();
 
       try {

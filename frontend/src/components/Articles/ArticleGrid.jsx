@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import ArticleCard from './ArticleCard';
+const API_BASE_URL1 = import.meta.env.VITE_API_BASE_URL;
 
 const ArticleList = ({ selectedCategory, searchTerm }) => {
   const [loading, setLoading] = useState(false); // ADD THIS
@@ -13,7 +14,7 @@ const ArticleList = ({ selectedCategory, searchTerm }) => {
     setLoading(true);
 
     try {
-      const response = await fetch(`http://localhost:5000/articles?...`);
+      const response = await fetch(`${API_BASE_URL1}/articles?...`);
       const text = await response.text();
 
       try {
