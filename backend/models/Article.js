@@ -1,4 +1,3 @@
-// backend/models/Article.js
 const mongoose = require('mongoose');
 
 const articleSchema = new mongoose.Schema({
@@ -7,7 +6,6 @@ const articleSchema = new mongoose.Schema({
   author: String,
   date: Date,
   category: String,
-  readTime: String,
   views: String,
   tags: [String]
 });
