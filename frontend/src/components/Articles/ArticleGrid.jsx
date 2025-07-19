@@ -1,54 +1,62 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import ArticleCard from './ArticleCard';
 const API_BASE_URL1 = import.meta.env.VITE_API_BASE_URL;
 
 const ArticleList = ({ selectedCategory, searchTerm }) => {
-  const [loading, setLoading] = useState(false); // ADD THIS
+  const [loading, setLoading] = useState(false);
   const [articles, setArticles] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const limit = 10; // articles per page
+  const limit = 10;
 
-  const fetchArticles = async () => {
-    if (loading) return;
+  const fetchArticles = async (pageToFetch) => {
+    if (loading || !hasMore) return;
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL1}/articles?...`);
-      const text = await response.text();
+      const query = new URLSearchParams({
+        category: (selectedCategory || 'all').toLowerCase(),
+        page: pageToFetch.toString(),
+        limit: limit.toString(),
+      });
+
+      const res = await fetch(`${API_BASE_URL1}/articles?${query}`);
+      const text = await res.text();
 
       try {
         const data = JSON.parse(text);
-
-        if (page === 1) {
-          setArticles(data);
-        } else {
-          setArticles(prev => [...prev, ...data]);
-        }
-
-        setHasMore(data.length >= 6);
-      } catch (jsonErr) {
-        console.error('JSON parse error:', jsonErr, 'Response text:', text);
+        setArticles(prev => (pageToFetch === 1 ? data : [...prev, ...data]));
+        setHasMore(data.length === limit);
+      } catch (err) {
+        console.error('JSON parse error:', err);
+        setHasMore(false);
       }
-    } catch (networkErr) {
-      console.error('Network error:', networkErr);
+    } catch (err) {
+      console.error('Network error:', err);
+      setHasMore(false);
     } finally {
       setLoading(false);
     }
-    console.log("Fetching:", `/articles?category=${(selectedCategory || 'all').toLowerCase()}&page=${page}&limit=6`);
   };
 
+  // Initial fetch/reset when category/search changes
   useEffect(() => {
     setPage(1);
     setHasMore(true);
-    fetchArticles();
+    fetchArticles(1); // Reset to page 1
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCategory]);
 
+  // Fetch next pages only when page > 1
+  useEffect(() => {
+    if (page > 1) fetchArticles(page);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
 
-  // Infinite scroll handler
+  // Infinite scroll
   useEffect(() => {
     const handleScroll = () => {
-      if (!hasMore) return;
+      if (loading || !hasMore) return;
 
       if (
         window.innerHeight + document.documentElement.scrollTop + 100 >=
@@ -60,15 +68,9 @@ const ArticleList = ({ selectedCategory, searchTerm }) => {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [hasMore]);
+  }, [loading, hasMore]);
 
-  // Fetch next page when page state changes (except first load)
-  useEffect(() => {
-    if (page === 1) return;
-    fetchArticles(page);
-  }, [page, fetchArticles]);
-
-  // Client-side filtering on search term
+  // Filtered client-side search (optional)
   const filteredArticles = articles.filter(article =>
     article.title.toLowerCase().includes((searchTerm || '').toLowerCase())
   );

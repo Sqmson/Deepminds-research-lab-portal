@@ -9,7 +9,7 @@ const useArticles = () => {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  const limit = 6; // Number of articles per page
+  const limit = 6;
 
   const fetchArticles = async () => {
     if (loading || !hasMore) return;
@@ -23,43 +23,39 @@ const useArticles = () => {
         limit: limit.toString(),
       });
 
-      const res = await fetch(`${API_BASE_URL}/articles?${query.toString()}`);
+      const res = await fetch(`${API_BASE_URL}/articles?${query}`);
       const text = await res.text();
 
       try {
         const data = JSON.parse(text);
 
-        if (!Array.isArray(data)) {
-          throw new Error('Invalid response format');
-        }
+        if (!Array.isArray(data)) throw new Error('Invalid response format');
 
-        if (page === 1) {
-          setArticles(data);
-        } else {
-          setArticles(prev => [...prev, ...data]);
-        }
-
-        setHasMore(data.length >= limit);
+        setArticles(prev => (page === 1 ? data : [...prev, ...data]));
+        setHasMore(data.length === limit); // mark false if less than limit
       } catch (jsonErr) {
-        console.error('JSON parse error:', jsonErr, 'Response text:', text);
+        console.error('JSON parse error:', jsonErr);
+        setHasMore(false);
       }
-    } catch (networkErr) {
-      console.error('Network error:', networkErr);
+    } catch (err) {
+      console.error('Network error:', err);
+      setHasMore(false);
     } finally {
       setLoading(false);
     }
   };
 
-  // Reset and fetch fresh data when filters change
+  // Trigger fresh load on filter changes
   useEffect(() => {
     setArticles([]);
     setPage(1);
     setHasMore(true);
   }, [category, searchTerm]);
 
-  // Fetch on page change
+  // Only fetch when page changes & hasMore
   useEffect(() => {
-    fetchArticles();
+    if (page === 1) fetchArticles();
+    else if (hasMore) fetchArticles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
@@ -67,13 +63,9 @@ const useArticles = () => {
   useEffect(() => {
     const handleScroll = () => {
       if (loading || !hasMore) return;
-
       const nearBottom =
         window.innerHeight + window.scrollY >= document.body.offsetHeight - 300;
-
-      if (nearBottom) {
-        setPage(prev => prev + 1);
-      }
+      if (nearBottom) setPage(prev => prev + 1);
     };
 
     window.addEventListener('scroll', handleScroll);
