@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-const categories = ['All', 'AI', 'Blockchain', 'Cybersecurity', 'Data Science'];
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const categories = [];
 
 const ArticleFilters = ({ selectedCategory, setSelectedCategory }) => {
+
   return (
     <div style={{ marginBottom: '1rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
       {categories.map((category) => (
