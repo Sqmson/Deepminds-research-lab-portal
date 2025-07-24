@@ -27,6 +27,16 @@ const NavLinks = ({ createRipple, isMobile = false, onLinkClick }) => {
       >
         Articles
       </Link>
+      <Link
+        to="/media"
+        className={baseClass}
+        onClick={e => {
+          createRipple(e);
+          onLinkClick && onLinkClick();
+        }}
+      >
+        Media
+      </Link>
       {isMobile && (
         <Link
           to="/projects"
