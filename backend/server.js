@@ -26,7 +26,7 @@ app.use(express.json());
 // Routes
 const articleRoutes = require('./routes/articles');
 app.use('/articles', articleRoutes);
-const videoRoutes = require('./routes/videos.js');
+const videoRoutes = require('./routes/videos');
 app.use('/videos', videoRoutes);
 
 // MongoDB Connection
