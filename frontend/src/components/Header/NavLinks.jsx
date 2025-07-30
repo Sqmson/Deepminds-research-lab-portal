@@ -28,14 +28,14 @@ const NavLinks = ({ createRipple, isMobile = false, onLinkClick }) => {
         Articles
       </Link>
       <Link
-        to="/video"
+        to="/videos"
         className={baseClass}
         onClick={e => {
           createRipple(e);
           onLinkClick && onLinkClick();
         }}
       >
-        video
+        Video
       </Link>
       {isMobile && (
         <Link
