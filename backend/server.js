@@ -18,13 +18,16 @@ app.use(
 );
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'https://deepminds-research-lab-portal.onrender.com',
+}));
 app.use(express.json());
 
 // Routes
 const articleRoutes = require('./routes/articles');
 app.use('/articles', articleRoutes);
-
+const videoRoutes = require('./routes/videos');
+app.use('/videos', videoRoutes);
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)

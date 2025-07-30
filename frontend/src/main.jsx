@@ -5,7 +5,8 @@ import { BrowserRouter, Routes, Route } from "react-router";
 
 import Lobby from "./Pages/Lobby.jsx";
 import ArticleLayout from "./components/Articles/ArticleLayout.jsx";
-import VideoPage from "./Pages/video.jsx"
+import VideoPage from "./Pages/VideoPage.jsx"
+import VideoListPage from "./Pages/VideoListePage.jsx";
 
 const root = document.getElementById("root");
 
@@ -13,9 +14,12 @@ ReactDOM.createRoot(root).render(
   <BrowserRouter>
     <Routes>
       <Route path='/' element={<App />}>
-        <Route index element={<Lobby />}/>
-        <Route path='articles' element={<ArticleLayout />}/>
-        <Route path='media' element={<VideoPage />}/>
+        <Route index element={<Lobby />} />
+        <Route path='articles' element={<ArticleLayout />} />
+        <Route path='media' element={<VideoListPage />} />
+        <Route path='media/:id' element={<VideoPage />} />
+        <Route path='media/:id/:title' element={<VideoPage />} />
+        <Route path='video' element={<VideoListPage />} /> {/* <-- Add this line */}
       </Route>
     </Routes>
   </BrowserRouter>,

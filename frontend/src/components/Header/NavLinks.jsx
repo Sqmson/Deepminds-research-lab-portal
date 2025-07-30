@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 const NavLinks = ({ createRipple, isMobile = false, onLinkClick }) => {
-  const baseClass = isMobile 
+  const baseClass = isMobile
     ? "nav-link block px-3 py-3 text-gray-700 hover:bg-gray-50 text-base rounded-md transition"
     : "nav-link text-gray-700 font-normal text-base py-2 px-3 rounded-md transition duration-200 active:scale-95";
 
@@ -28,14 +28,14 @@ const NavLinks = ({ createRipple, isMobile = false, onLinkClick }) => {
         Articles
       </Link>
       <Link
-        to="/media"
+        to="/video"
         className={baseClass}
         onClick={e => {
           createRipple(e);
           onLinkClick && onLinkClick();
         }}
       >
-        Media
+        video
       </Link>
       {isMobile && (
         <Link
