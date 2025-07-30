@@ -18,8 +18,19 @@ app.use(
 );
 
 // Middleware
+const allowedOrigins = [
+  'https://deepminds-research-lab-portal.onrender.com',
+  'https://deepminds-research-lab-portal-frontend.onrender.com'
+];
+
 app.use(cors({
-  origin: 'https://deepminds-research-lab-portal.onrender.com',
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
 }));
 app.use(express.json());
 
@@ -28,8 +39,6 @@ const articleRoutes = require('./routes/articles');
 app.use('/articles', articleRoutes);
 const videoRoutes = require('./routes/videos');
 app.use('/videos', videoRoutes);
-
-console.log('🧠 /videos route has been registered.');
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
