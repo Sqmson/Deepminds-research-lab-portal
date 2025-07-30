@@ -29,6 +29,8 @@ app.use('/articles', articleRoutes);
 const videoRoutes = require('./routes/videos');
 app.use('/videos', videoRoutes);
 
+console.log('🧠 /videos route has been registered.');
+
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
