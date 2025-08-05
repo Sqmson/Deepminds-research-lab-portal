@@ -7,6 +7,7 @@ const router = express.Router();
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 const CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID;
 
+
 // GET /videos
 router.get('/', async (req, res) => {
   try {
@@ -38,6 +39,20 @@ router.get('/', async (req, res) => {
   } catch (error) {
     console.error('Failed to fetch YouTube videos:', error.message);
     res.status(500).json({ error: 'Failed to fetch videos' });
+  }
+});
+
+// GET /videos/:id
+const Video = require('../models/Video');
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ error: 'Missing video id' });
+    const video = await Video.findById(id);
+    if (!video) return res.status(404).json({ error: 'Video not found' });
+    res.json(video);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching video' });
   }
 });
 

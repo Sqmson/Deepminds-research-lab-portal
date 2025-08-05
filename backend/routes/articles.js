@@ -2,24 +2,31 @@ const express = require('express');
 const router = express.Router();
 const Article = require('../models/Article');
 
+
 // GET all or filtered articles
 router.get('/', async (req, res) => {
   try {
     const { category, page = 1, limit = 10 } = req.query;
     const filter = category && category !== 'all' ? { category } : {};
-
-    // Calculate how many documents to skip
     const skip = (parseInt(page) - 1) * parseInt(limit);
-
-    // Retrieve paginated articles
     const articles = await Article.find(filter)
       .sort({ date: -1 })
       .skip(skip)
       .limit(parseInt(limit));
-
     res.json(articles);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch articles' });
+  }
+});
+
+// GET /articles/:id
+router.get('/:id', async (req, res) => {
+  try {
+    const article = await Article.findById(req.params.id);
+    if (!article) return res.status(404).json({ error: 'Article not found' });
+    res.json(article);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching article' });
   }
 });
 

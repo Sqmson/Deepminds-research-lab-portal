@@ -31,7 +31,8 @@ const articleRoutes = require('./routes/articles');
 app.use('/articles', articleRoutes);
 const videoRoutes = require('./routes/videos');
 app.use('/videos', videoRoutes);
-
+// const videoRoute = require('./routes/video');
+// app.use('/video', videoRoute);
 
 const PORT0 = process.env.PORT || 5000;
 // Server setup

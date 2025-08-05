@@ -5,7 +5,6 @@ const videoSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: String,
   author: String,
-  authorAvatar: String, // emoji or image URL
   category: String,
   duration: String,
   views: { type: Number, default: 0 },

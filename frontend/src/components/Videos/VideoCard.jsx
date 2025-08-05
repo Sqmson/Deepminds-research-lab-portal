@@ -12,7 +12,7 @@ const VideoCard = ({ video, onClick }) => {
     description,
     tags = [],
     author,
-    authorAvatar = "👤",
+    // authorAvatar removed, fallback to generic avatar if needed
     category,
     thumbnail,
     videoUrl,
@@ -24,7 +24,7 @@ const VideoCard = ({ video, onClick }) => {
   const handleMouseEnter = () => {
     setIsHovered(true);
     if (videoRef.current && isLoaded) {
-      videoRef.current.play().catch(() => {});
+      videoRef.current.play().catch(() => { });
     }
   };
 
@@ -219,7 +219,7 @@ const VideoCard = ({ video, onClick }) => {
         flexWrap: 'wrap'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ fontSize: '1rem' }}>{authorAvatar}</span>
+          <span style={{ fontSize: '1rem' }}>👤</span>
           <strong style={{ color: '#24292e' }}>{author}</strong>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>

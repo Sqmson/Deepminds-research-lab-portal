@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ArticleCard from './ArticleCard';
+import { Link } from 'react-router-dom';
 const API_BASE_URL1 = import.meta.env.VITE_API_BASE_URL;
 
 const ArticleList = ({ selectedCategory, searchTerm }) => {
@@ -39,25 +40,19 @@ const ArticleList = ({ selectedCategory, searchTerm }) => {
     }
   };
 
-  // Initial fetch/reset when category/search changes
   useEffect(() => {
     setPage(1);
     setHasMore(true);
-    fetchArticles(1); // Reset to page 1
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchArticles(1);
   }, [selectedCategory]);
 
-  // Fetch next pages only when page > 1
   useEffect(() => {
     if (page > 1) fetchArticles(page);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
-  // Infinite scroll
   useEffect(() => {
     const handleScroll = () => {
       if (loading || !hasMore) return;
-
       if (
         window.innerHeight + document.documentElement.scrollTop + 100 >=
         document.documentElement.offsetHeight
@@ -65,12 +60,10 @@ const ArticleList = ({ selectedCategory, searchTerm }) => {
         setPage(prevPage => prevPage + 1);
       }
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [loading, hasMore]);
 
-  // Filtered client-side search (optional)
   const filteredArticles = articles.filter(article =>
     article.title.toLowerCase().includes((searchTerm || '').toLowerCase())
   );
@@ -78,7 +71,9 @@ const ArticleList = ({ selectedCategory, searchTerm }) => {
   return (
     <div>
       {filteredArticles.map(article => (
-        <ArticleCard key={article._id} article={article} />
+        <Link key={article._id} to={`/articles/${article._id}`}>
+          <ArticleCard article={article} />
+        </Link>
       ))}
       {!hasMore && (
         <p style={{ textAlign: 'center', color: '#888', marginTop: '1rem' }}>

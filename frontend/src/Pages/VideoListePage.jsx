@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import VideoSearch from '../components/Videos/VideoSearch';
 import VideoFilters from '../components/Videos/VideoFilters';
 import VideoCard from '../components/Videos/VideoCard';
+import { Link } from 'react-router-dom';
 import useVideos from '../hooks/useVideos';
 
 const VideoListPage = () => {
@@ -29,9 +30,7 @@ const VideoListPage = () => {
     setFilteredVideos(filtered);
   }, [videos, searchTerm, selectedCategory]);
 
-  const handleVideoClick = (video) => {
-    console.log('Video clicked:', video.title);
-  };
+  // Navigation handled by <Link> wrapping each VideoCard
 
   return (
     <div style={{ backgroundColor: '#ffffff', minHeight: '100vh' }}>
@@ -85,7 +84,9 @@ const VideoListPage = () => {
               </div>
             ) : (
               filteredVideos.map(video => (
-                <VideoCard key={video._id} video={video} onClick={handleVideoClick} />
+                <Link key={video._id} to={`/videos/${video._id}`}>
+                  <VideoCard video={video} />
+                </Link>
               ))
             )}
 
