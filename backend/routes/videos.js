@@ -42,18 +42,41 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /videos/:id
-const Video = require('../models/Video');
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    if (!id) return res.status(400).json({ error: 'Missing video id' });
-    const video = await Video.findById(id);
-    if (!video) return res.status(404).json({ error: 'Video not found' });
-    res.json(video);
+    const response = await axios.get('https://www.googleapis.com/youtube/v3/videos', {
+      params: {
+        key: YOUTUBE_API_KEY,
+        id,
+        part: 'snippet,contentDetails,statistics',
+      },
+    });
+
+    if (response.data.items.length === 0) {
+      return res.status(404).json({ error: 'Video not found' });
+    }
+
+    const video = response.data.items[0];
+    const formattedVideo = {
+      _id: id,
+      title: video.snippet.title,
+      description: video.snippet.description,
+      thumbnail: video.snippet.thumbnails.medium.url,
+      author: video.snippet.channelTitle,
+      uploadDate: video.snippet.publishedAt,
+      category: 'YouTube',
+      views: video.statistics.viewCount,
+      likes: video.statistics.likeCount,
+      duration: video.contentDetails.duration,
+    };
+
+    res.json(formattedVideo);
   } catch (error) {
-    res.status(500).json({ error: 'Error fetching video' });
+    console.error('Failed to fetch video by ID:', error.message);
+    res.status(500).json({ error: 'Failed to fetch video' });
   }
 });
+
 
 module.exports = router;
