@@ -7,7 +7,7 @@ import RelatedVideos from '../components/VideoPage/RelatedVideos';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const VideoPage = () => {
-  const { id } = useParams();
+  const { title } = useParams();
   const [videoData, setVideoData] = useState(null);
   const [relatedVideos, setRelatedVideos] = useState([]);
   const [error, setError] = useState(null);
@@ -18,7 +18,7 @@ const VideoPage = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`${API_BASE_URL}/videos/${id}`);
+        const res = await fetch(`${API_BASE_URL}/videos/${title}`);
         if (!res.ok) throw new Error('Video not found');
         const data = await res.json();
         setVideoData(data);
@@ -28,8 +28,8 @@ const VideoPage = () => {
         setLoading(false);
       }
     };
-    if (id) fetchVideo();
-  }, [id]);
+    if (title) fetchVideo();
+  }, [title]);
 
   useEffect(() => {
     // Fetch related videos (excluding current)
@@ -37,11 +37,12 @@ const VideoPage = () => {
       try {
         const res = await fetch(`${API_BASE_URL}/videos`);
         const data = await res.json();
-        setRelatedVideos(data.filter(v => v._id !== id).slice(0, 5));
+        setRelatedVideos(data.filter(v => v.title !== title).slice(0, 5));
+      // eslint-disable-next-line no-empty
       } catch { }
     };
-    if (id) fetchRelated();
-  }, [id]);
+    if (title) fetchRelated();
+  }, [title]);
 
   if (error) {
     return <div style={{ color: 'red', textAlign: 'center', marginTop: 40 }}>Error loading video: {error}</div>;
@@ -56,7 +57,6 @@ const VideoPage = () => {
   return (
     <div style={{
       backgroundColor: '#ffffff',
-      minHeight: '100vh',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     }}>
       <div style={{
@@ -65,7 +65,7 @@ const VideoPage = () => {
         padding: '20px'
       }}>
         <VideoPlayer
-          videoId={videoData._id}
+          videoId={videoData.title}
           duration={videoData.duration}
         />
         <div style={{

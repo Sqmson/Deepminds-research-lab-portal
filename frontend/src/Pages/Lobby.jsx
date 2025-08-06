@@ -1,22 +1,28 @@
-import React from "react";
+import QuickNavigation from '../components/Lobby/QuickNavigation';
+import Announcements from '../components/Lobby/AnnouncementStrip';
 
-function Lobby() {
+const Lobby = () => {
   return (
-    <section style={{
-      minHeight: "80vh",
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      alignItems: "center",
-      padding: "2rem",
-      textAlign: "center"
+    <div style={{
+      backgroundColor: '#f8fafc',
+      padding: '20px'
     }}>
-      <p style={{ fontSize: "1rem", maxWidth: "600px" }}>
-        <i>Still figuring how to design this here</i> <br /> <strong>Layout <br />...</strong> <br />
-      </p>
-      <div><p>It'll probably remain like this</p></div>
-    </section>
+      <div style={{
+        maxWidth: '1200px',
+        margin: '0 auto'
+      }}>
+        <QuickNavigation />
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+          gap: '30px',
+          marginBottom: '30px'
+        }}>
+          <Announcements />
+        </div>
+      </div>
+    </div>
   );
-}
+};
 
 export default Lobby;

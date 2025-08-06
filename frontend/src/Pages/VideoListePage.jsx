@@ -30,10 +30,8 @@ const VideoListPage = () => {
     setFilteredVideos(filtered);
   }, [videos, searchTerm, selectedCategory]);
 
-  // Navigation handled by <Link> wrapping each VideoCard
-
   return (
-    <div style={{ backgroundColor: '#ffffff', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: '#ffffff', display: 'flex', flexDirection: 'column' }}>
       {/* Header Section */}
       <div style={{
         backgroundColor: '#fafafa',

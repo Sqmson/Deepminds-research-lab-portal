@@ -4,19 +4,19 @@ import Header from "./components/Header/Header";
 import Footer from "./components/Footer";
 
 function App() {
-
   return (
     <>
-      <Header />
-      <main className="transition-all duration-300 ease-in-out">
-        <AnimatePresence mode="wait">
-          <Outlet /> {/* This renders current page */}
-        </AnimatePresence>
-      </main>
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow">
+          <AnimatePresence mode="wait">
+            <Outlet />
+          </AnimatePresence>
+        </main>
+      </div>
       <Footer />
     </>
-  )
-  
+  );
 }
 
 export default App;
