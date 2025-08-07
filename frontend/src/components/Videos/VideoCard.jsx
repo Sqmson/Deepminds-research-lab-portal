@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react';
-import { Play, Calendar, Eye, Clock, Volume2, VolumeX } from 'lucide-react';
+import { Play, Calendar, Eye, Clock, Volume2, VolumeX, MoreVertical } from 'lucide-react';
 
 const VideoCard = ({ video, onClick }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const videoRef = useRef(null);
 
   const {
@@ -12,7 +13,6 @@ const VideoCard = ({ video, onClick }) => {
     description,
     tags = [],
     author,
-    // authorAvatar removed, fallback to generic avatar if needed
     category,
     thumbnail,
     videoUrl,
@@ -43,73 +43,110 @@ const VideoCard = ({ video, onClick }) => {
     }
   };
 
+  const formatViews = (count) => {
+    if (count >= 1000000) {
+      return (count / 1000000).toFixed(1) + 'M';
+    } else if (count >= 1000) {
+      return (count / 1000).toFixed(1) + 'K';
+    }
+    return count?.toString() || '0';
+  };
+
+  const getTimeAgo = (date) => {
+    const now = new Date();
+    const uploadTime = new Date(date);
+    const diffTime = Math.abs(now - uploadTime);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 7) {
+      return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    } else if (diffDays < 30) {
+      const weeks = Math.floor(diffDays / 7);
+      return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+    } else if (diffDays < 365) {
+      const months = Math.floor(diffDays / 30);
+      return `${months} month${months > 1 ? 's' : ''} ago`;
+    } else {
+      const years = Math.floor(diffDays / 365);
+      return `${years} year${years > 1 ? 's' : ''} ago`;
+    }
+  };
+
   return (
     <div
       onClick={() => onClick(video)}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       style={{
-        border: '1px solid #d1d5da',
-        borderRadius: '16px',
-        padding: '1rem',
-        marginBottom: '1.5rem',
+        display: 'flex',
         backgroundColor: '#ffffff',
-        boxShadow: isHovered
-          ? '0 4px 12px rgba(0, 0, 0, 0.1)'
-          : '0 2px 6px rgba(0, 0, 0, 0.05)',
-        maxWidth: '600px',
+        borderRadius: '12px',
+        marginBottom: '16px',
         cursor: 'pointer',
-        transition: 'all 0.2s ease',
-        transform: isHovered ? 'translateY(-2px)' : 'translateY(0)'
+        transition: 'all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1)',
+        transform: isHovered ? 'translateY(-1px)' : 'translateY(0)',
+        boxShadow: isHovered 
+          ? '0 8px 25px rgba(0, 0, 0, 0.12), 0 4px 10px rgba(0, 0, 0, 0.08)' 
+          : '0 2px 8px rgba(0, 0, 0, 0.04)',
+        border: '1px solid',
+        borderColor: isHovered ? 'rgba(0, 0, 0, 0.08)' : 'transparent',
+        padding: '0',
+        overflow: 'hidden',
+        maxWidth: '100%',
+        minHeight: '94px'
       }}
     >
-      {/* Video Container */}
+      {/* Video Thumbnail Container */}
       <div style={{
-        width: '100%',
-        height: '200px',
-        backgroundColor: '#f6f8fa',
-        borderRadius: '12px',
-        marginBottom: '0.75rem',
+        width: '168px',
+        height: '94px',
+        flexShrink: 0,
+        backgroundColor: '#f8f9fa',
+        borderRadius: '8px',
+        margin: '12px',
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        border: '1px solid rgba(0, 0, 0, 0.06)'
       }}>
-        {/* Thumbnail */}
-        {!isHovered && (
+        {/* Thumbnail Image */}
+        {!isHovered && !imageError && (
           <img
             src={thumbnail}
             alt={title}
             style={{
               width: '100%',
               height: '100%',
-              objectFit: 'cover'
+              objectFit: 'cover',
+              borderRadius: '8px'
             }}
-            onError={(e) => {
-              e.target.style.display = 'none';
-              e.target.nextSibling.style.display = 'flex';
-            }}
+            onError={() => setImageError(true)}
           />
         )}
 
-        {/* Fallback */}
-        <div style={{
-          width: '100%',
-          height: '100%',
-          backgroundColor: '#f1f3f4',
-          display: !isHovered && !thumbnail ? 'flex' : 'none',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '4rem',
-          opacity: 0.7
-        }}>
-          🎥
-        </div>
+        {/* Fallback for missing thumbnail */}
+        {(imageError || !thumbnail) && !isHovered && (
+          <div style={{
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#f1f3f4',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '24px',
+            color: '#5f6368',
+            borderRadius: '8px'
+          }}>
+            🎥
+          </div>
+        )}
 
-        {/* Video Element */}
+        {/* Video Element for Preview */}
         <video
           ref={videoRef}
           src={videoUrl}
           muted={isMuted}
           playsInline
+          loop
           onLoadedData={() => setIsLoaded(true)}
           style={{
             width: '100%',
@@ -119,7 +156,8 @@ const VideoCard = ({ video, onClick }) => {
             top: 0,
             left: 0,
             opacity: isHovered ? 1 : 0,
-            transition: 'opacity 0.2s ease'
+            transition: 'opacity 0.3s ease',
+            borderRadius: '8px'
           }}
         />
 
@@ -130,31 +168,49 @@ const VideoCard = ({ video, onClick }) => {
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            backgroundColor: 'rgba(0,0,0,0.7)',
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
             borderRadius: '50%',
-            width: '60px',
-            height: '60px',
+            width: '32px',
+            height: '32px',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            transition: 'all 0.2s ease'
           }}>
-            <Play size={24} color="white" style={{ marginLeft: '3px' }} />
+            <Play size={16} color="white" style={{ marginLeft: '2px' }} />
           </div>
         )}
 
-        {/* Mute Button */}
+        {/* Duration Badge */}
+        <div style={{
+          position: 'absolute',
+          bottom: '4px',
+          right: '4px',
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          color: 'white',
+          padding: '2px 6px',
+          borderRadius: '4px',
+          fontSize: '11px',
+          fontWeight: '500',
+          letterSpacing: '0.5px',
+          fontFamily: 'monospace'
+        }}>
+          {duration || '0:00'}
+        </div>
+
+        {/* Mute Toggle Button */}
         {isHovered && (
           <button
             onClick={toggleMute}
             style={{
               position: 'absolute',
-              top: '12px',
-              right: '12px',
-              backgroundColor: 'rgba(0,0,0,0.7)',
+              top: '6px',
+              right: '6px',
+              backgroundColor: 'rgba(0, 0, 0, 0.7)',
               border: 'none',
               borderRadius: '50%',
-              width: '36px',
-              height: '36px',
+              width: '28px',
+              height: '28px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -162,101 +218,135 @@ const VideoCard = ({ video, onClick }) => {
               transition: 'background-color 0.2s ease',
               zIndex: 10
             }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(0,0,0,0.9)'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = 'rgba(0,0,0,0.7)'}
           >
-            {isMuted ? <VolumeX size={16} color="white" /> : <Volume2 size={16} color="white" />}
+            {isMuted ? <VolumeX size={12} color="white" /> : <Volume2 size={12} color="white" />}
           </button>
         )}
+      </div>
 
-        {/* Duration Badge */}
+      {/* Video Info Container */}
+      <div style={{
+        flex: 1,
+        padding: '12px 16px 12px 0',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        minHeight: '94px'
+      }}>
+        {/* Title */}
+        <div>
+          <h3 style={{
+            fontSize: '16px',
+            lineHeight: '1.3',
+            color: '#1a0dab',
+            margin: '0 0 4px 0',
+            fontWeight: '400',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            textDecoration: isHovered ? 'underline' : 'none',
+            cursor: 'pointer'
+          }}>
+            {title}
+          </h3>
+          
+          {/* Source and Meta Info */}
+          <div style={{
+            fontSize: '14px',
+            color: '#5f6368',
+            lineHeight: '1.4',
+            marginBottom: '2px'
+          }}>
+            <span style={{ 
+              color: '#202124',
+              marginRight: '8px'
+            }}>
+              {author}
+            </span>
+            <span style={{ marginRight: '8px' }}>•</span>
+            <span>{formatViews(views)} views</span>
+            <span style={{ marginLeft: '8px', marginRight: '8px' }}>•</span>
+            <span>{getTimeAgo(uploadDate)}</span>
+          </div>
+        </div>
+
+        {/* Description */}
         <div style={{
-          position: 'absolute',
-          bottom: '8px',
-          right: '8px',
-          backgroundColor: 'rgba(0,0,0,0.8)',
-          color: 'white',
-          padding: '4px 8px',
-          borderRadius: '4px',
-          fontSize: '12px',
+          fontSize: '14px',
+          color: '#5f6368',
+          lineHeight: '1.4',
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+          marginTop: '4px'
+        }}>
+          {description}
+        </div>
+
+        {/* Tags and Category */}
+        <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '4px'
+          gap: '8px',
+          marginTop: '8px',
+          flexWrap: 'wrap'
         }}>
-          <Clock size={12} />
-          {duration}
-        </div>
-      </div>
-
-      {/* Video Info */}
-      <h2 style={{
-        fontSize: '1.25rem',
-        marginBottom: '0.5rem',
-        color: '#24292e',
-        fontWeight: '600',
-        lineHeight: '1.3'
-      }}>
-        {title}
-      </h2>
-
-      <p style={{
-        color: '#586069',
-        fontSize: '0.95rem',
-        marginBottom: '0.75rem',
-        lineHeight: '1.4'
-      }}>
-        {description}
-      </p>
-
-      {/* Meta Info */}
-      <div style={{
-        fontSize: '0.8rem',
-        color: '#586069',
-        marginBottom: '0.75rem',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px',
-        flexWrap: 'wrap'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ fontSize: '1rem' }}>👤</span>
-          <strong style={{ color: '#24292e' }}>{author}</strong>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <Calendar size={12} />
-          {new Date(uploadDate).toDateString()}
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <Eye size={12} />
-          {views} views
-        </div>
-        <span style={{
-          backgroundColor: '#f1f3f4',
-          color: '#586069',
-          padding: '2px 8px',
-          borderRadius: '12px',
-          fontSize: '11px'
-        }}>
-          {category}
-        </span>
-      </div>
-
-      {/* Tags */}
-      <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
-        {tags.map((tag, i) => (
-          <span
-            key={i}
-            style={{
-              backgroundColor: '#e0e7ff',
-              padding: '0.3rem 0.6rem',
+          {category && (
+            <span style={{
+              backgroundColor: '#f8f9fa',
+              color: '#5f6368',
+              padding: '2px 8px',
               borderRadius: '12px',
-              fontSize: '0.75rem',
-              color: '#1e40af'
-            }}
-          >
-            #{tag}
-          </span>
-        ))}
+              fontSize: '12px',
+              fontWeight: '500',
+              border: '1px solid #e8eaed'
+            }}>
+              {category}
+            </span>
+          )}
+          {tags.slice(0, 2).map((tag, i) => (
+            <span
+              key={i}
+              style={{
+                backgroundColor: '#e8f0fe',
+                color: '#1a73e8',
+                padding: '2px 8px',
+                borderRadius: '12px',
+                fontSize: '12px',
+                fontWeight: '500'
+              }}
+            >
+              #{tag}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* More Options Button */}
+      <div style={{
+        padding: '12px 16px 12px 0',
+        display: 'flex',
+        alignItems: 'flex-start'
+      }}>
+        <button
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: '8px',
+            borderRadius: '50%',
+            color: '#5f6368',
+            transition: 'background-color 0.2s ease',
+            opacity: isHovered ? 1 : 0.7
+          }}
+          onMouseEnter={(e) => e.target.style.backgroundColor = '#f1f3f4'}
+          onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+        >
+          <MoreVertical size={16} />
+        </button>
       </div>
     </div>
   );

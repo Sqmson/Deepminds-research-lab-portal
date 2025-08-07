@@ -4,7 +4,7 @@ import App from './App.jsx';
 import { BrowserRouter, Routes, Route } from "react-router";
 
 import Lobby from "./Pages/Lobby.jsx";
-import ArticleLayout from "./components/Articles/ArticleLayout.jsx";
+import ArticleLayout from "./Pages/ArticleLayout.jsx";
 import VideoPage from "./Pages/VideoPage.jsx";
 import VideoListPage from "./Pages/VideoListePage.jsx";
 import ArticlePage from "./Pages/ArticlePage.jsx";

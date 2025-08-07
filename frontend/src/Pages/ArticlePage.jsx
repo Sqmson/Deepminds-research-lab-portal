@@ -40,8 +40,7 @@ const ArticlePage = () => {
   return (
     <div style={{
       backgroundColor: '#fff',
-      minHeight: '100vh',
-      maxWidth: '700px',
+      maxWidth: '100vh',
       margin: '0 auto',
       padding: '2rem'
     }}>
