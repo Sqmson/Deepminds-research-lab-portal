@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
         channelId: CHANNEL_ID,
         part: 'snippet',
         order: 'date',
-        maxResults: 20,
+        maxResults
       },
     });
 
@@ -29,10 +29,7 @@ router.get('/', async (req, res) => {
         description: item.snippet.description,
         thumbnail: item.snippet.thumbnails.medium.url,
         author: item.snippet.channelTitle,
-        uploadDate: item.snippet.publishedAt,
-        category: 'YouTube',
-        views: 'N/A',
-        duration: 'N/A',
+        uploadDate: item.snippet.publishedAt
       }));
 
     res.json(videos);
