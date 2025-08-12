@@ -1,110 +1,164 @@
-import React, { useState, useEffect } from 'react';
-import VideoSearch from '../components/Videos/VideoSearch';
-import VideoFilters from '../components/Videos/VideoFilters';
-import VideoCard from '../components/Videos/VideoCard';
-import { Link } from 'react-router-dom';
-import useVideos from '../hooks/useVideos';
+import React, { useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import VideoSearch from "../components/Videos/VideoSearch";
+import VideoList from "../components/Videos/VideoList";
+import useVideos from "../hooks/useVideos";
 
-const VideoListPage = () => {
-  const { videos, loading, error } = useVideos();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [filteredVideos, setFilteredVideos] = useState([]);
+const VideoListePage = () => {
+  const navigate = useNavigate();
+  const [searchOptions, setSearchOptions] = useState({
+    search: '',
+    category: 'All',
+    researchArea: 'All',
+    sortBy: 'publishedAt',
+    sortOrder: 'desc',
+    page: 1,
+    limit: 20
+  });
+  const [layout, setLayout] = useState('grid');
 
-  useEffect(() => {
-    let filtered = videos;
+  const { videos, loading, error, pagination, filters } = useVideos(searchOptions);
 
-    if (selectedCategory !== 'All') {
-      filtered = filtered.filter(video => video.category === selectedCategory);
-    }
+  const handleSearch = useCallback((searchTerm) => {
+    setSearchOptions(prev => ({
+      ...prev,
+      search: searchTerm,
+      page: 1 // Reset to first page on new search
+    }));
+  }, []);
 
-    if (searchTerm) {
-      filtered = filtered.filter(video =>
-        video.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        video.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        video.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        video.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
-    }
+  const handleFilterChange = useCallback((newFilters) => {
+    setSearchOptions(prev => ({
+      ...prev,
+      ...newFilters,
+      page: 1 // Reset to first page on filter change
+    }));
+  }, []);
 
-    setFilteredVideos(filtered);
-  }, [videos, searchTerm, selectedCategory]);
+  const handleSortChange = useCallback((sortBy, sortOrder) => {
+    setSearchOptions(prev => ({
+      ...prev,
+      sortBy,
+      sortOrder,
+      page: 1 // Reset to first page on sort change
+    }));
+  }, []);
+
+  const handlePageChange = useCallback((page) => {
+    setSearchOptions(prev => ({
+      ...prev,
+      page
+    }));
+    // Scroll to top when page changes
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  const handleVideoClick = useCallback((video) => {
+    navigate(`/videos/${video.slug}`);
+  }, [navigate]);
+
+  const handleLayoutChange = useCallback((newLayout) => {
+    setLayout(newLayout);
+  }, []);
 
   return (
-    <div style={{ backgroundColor: '#ffffff', display: 'flex', flexDirection: 'column' }}>
-      {/* Header Section */}
-      <div style={{
-        backgroundColor: '#fafafa',
-        borderBottom: '1px solid #e1e4e8',
-        padding: '32px 0'
-      }}>
-        <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          padding: '0 20px'
-        }}>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Research Lab Videos
+            </h1>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Explore our collection of research discussions, tutorials, seminars, and lab work recordings
+            </p>
+          </div>
+        </div>
+      </div>
 
-          <VideoSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-          <VideoFilters
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
+      {/* Search and Filters */}
+      <VideoSearch
+        onSearch={handleSearch}
+        onFilterChange={handleFilterChange}
+        onSortChange={handleSortChange}
+        onLayoutChange={handleLayoutChange}
+        filters={searchOptions}
+        currentLayout={layout}
+        availableCategories={filters?.categories || []}
+        availableResearchAreas={filters?.researchAreas || []}
+        isLoading={loading}
+      />
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Featured Videos Section */}
+        {!searchOptions.search && searchOptions.category === 'All' && searchOptions.page === 1 && (
+          <FeaturedVideosSection onVideoClick={handleVideoClick} />
+        )}
+
+        {/* Video List */}
+        <div className={searchOptions.search || searchOptions.category !== 'All' ? '' : 'mt-12'}>
+          <VideoList
+            videos={videos}
+            loading={loading}
+            error={error}
+            layout={layout}
+            pagination={pagination}
+            onVideoClick={handleVideoClick}
+            onPageChange={handlePageChange}
+            showPreview={true}
+            emptyStateMessage={
+              searchOptions.search
+                ? `No videos found for "${searchOptions.search}"`
+                : "No videos available"
+            }
+            emptyStateDescription={
+              searchOptions.search
+                ? "Try adjusting your search terms or filters to find more videos."
+                : "Videos will appear here once they are synced from the YouTube channel."
+            }
           />
         </div>
       </div>
 
-      {/* Main Content */}
-      <div style={{
-        maxWidth: '1200px',
-        margin: '0 auto',
-        padding: '32px 20px'
-      }}>
-        {loading && (
-          <p style={{ textAlign: 'center', color: '#586069' }}>Loading videos...</p>
-        )}
+    </div>
+  );
+};
 
-        {error && (
-          <p style={{ textAlign: 'center', color: '#d73a49' }}>Error: {error}</p>
-        )}
+// Featured Videos Section Component
+const FeaturedVideosSection = ({ onVideoClick }) => {
+  const { videos: featuredVideos, loading } = useVideos({ featured: 'true', limit: 4 });
 
-        {!loading && !error && (
-          <>
-            {filteredVideos.length === 0 ? (
-              <div style={{
-                textAlign: 'center',
-                padding: '3rem',
-                color: '#586069'
-              }}>
-                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📹</div>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', color: '#24292e' }}>
-                  No videos found
-                </h3>
-                <p>Try adjusting your search or filter criteria.</p>
-              </div>
-            ) : (
-              filteredVideos.map(video => (
-                <Link key={video._id} to={`/videos/${video._id}`}>
-                  <VideoCard video={video} />
-                </Link>
-              ))
-            )}
+  if (loading || !featuredVideos || featuredVideos.length === 0) {
+    return null;
+  }
 
-            {/* Results Summary */}
-            <div style={{
-              textAlign: 'center',
-              marginTop: '2rem',
-              padding: '1rem',
-              color: '#586069',
-              fontSize: '0.9rem'
-            }}>
-              Showing {filteredVideos.length} video{filteredVideos.length !== 1 ? 's' : ''}
-              {selectedCategory !== 'All' && ` in ${selectedCategory}`}
-              {searchTerm && ` matching "${searchTerm}"`}
+  return (
+    <div className="mb-12">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold text-gray-900">Featured Videos</h2>
+        <div className="h-px bg-gradient-to-r from-blue-600 to-transparent flex-1 ml-6"></div>
+      </div>
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {featuredVideos.map((video) => (
+          <div key={video.youtubeId} className="relative">
+            <div className="absolute -top-2 -right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full z-10">
+              Featured
             </div>
-          </>
-        )}
+            <VideoCard
+              video={video}
+              onClick={onVideoClick}
+              layout="grid"
+              showPreview={true}
+            />
+          </div>
+        ))}
       </div>
     </div>
   );
 };
 
-export default VideoListPage;
+
+export default VideoListePage;

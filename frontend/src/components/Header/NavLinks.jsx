@@ -15,17 +15,27 @@ const NavLinks = ({ createRipple, isMobile = false, onLinkClick }) => {
           onLinkClick && onLinkClick();
         }}
       >
-        Lobby
+        Home
       </Link>
       <Link
-        to="/articles"
+        to="/publications"
         className={baseClass}
         onClick={e => {
           createRipple(e);
           onLinkClick && onLinkClick();
         }}
       >
-        Articles
+        Publications
+      </Link>
+      <Link
+        to="/members"
+        className={baseClass}
+        onClick={e => {
+          createRipple(e);
+          onLinkClick && onLinkClick();
+        }}
+      >
+        Members
       </Link>
       <Link
         to="/videos"
@@ -35,19 +45,41 @@ const NavLinks = ({ createRipple, isMobile = false, onLinkClick }) => {
           onLinkClick && onLinkClick();
         }}
       >
-        Video
+        Videos
+      </Link>
+      <Link
+        to="/about"
+        className={baseClass}
+        onClick={e => {
+          createRipple(e);
+          onLinkClick && onLinkClick();
+        }}
+      >
+        About
       </Link>
       {isMobile && (
-        <Link
-          to="/projects"
-          className={baseClass}
-          onClick={e => {
-            createRipple(e);
-            onLinkClick && onLinkClick();
-          }}
-        >
-          Projects
-        </Link>
+        <>
+          <Link
+            to="/articles"
+            className={baseClass}
+            onClick={e => {
+              createRipple(e);
+              onLinkClick && onLinkClick();
+            }}
+          >
+            Articles
+          </Link>
+          <Link
+            to="/announcements"
+            className={baseClass}
+            onClick={e => {
+              createRipple(e);
+              onLinkClick && onLinkClick();
+            }}
+          >
+            Announcements
+          </Link>
+        </>
       )}
     </>
   );

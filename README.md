@@ -26,7 +26,7 @@ How to Get Involved
 
     Reach out to the lab coordinator or the leading professor via the contact information on the portal.
 
-    Participate in ongoing research discussions or propose your own ideas.
+    Participate in ongoing research discussions or propose your own ideas in organized meetings.
 
     Engage with seminars, workshops, and lab meetings hosted through the portal.
 

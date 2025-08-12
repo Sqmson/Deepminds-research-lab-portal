@@ -1,354 +1,259 @@
-import React, { useState, useRef } from 'react';
-import { Play, Calendar, Eye, Clock, Volume2, VolumeX, MoreVertical } from 'lucide-react';
+import React, { useState, useRef, useEffect } from "react";
+import { Play, Volume2, VolumeX, MoreVertical, Clock, Eye, Calendar, Tag } from "lucide-react";
 
-const VideoCard = ({ video, onClick }) => {
+const VideoCard = ({
+  video,
+  onClick,
+  layout = 'grid', // 'grid' or 'list'
+  showPreview = true,
+  className = ''
+}) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
-  const [isLoaded, setIsLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const videoRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const hoverTimeoutRef = useRef(null);
 
   const {
+    youtubeId,
     title,
+    channelTitle,
+    bestThumbnail,
+    publishedAt,
+    viewCount,
+    formattedDuration,
     description,
-    tags = [],
-    author,
     category,
-    thumbnail,
-    videoUrl,
-    uploadDate,
-    duration,
-    views
+    researchArea,
+    tags = [],
+    embedUrl,
+    localViews = 0
   } = video;
 
   const handleMouseEnter = () => {
-    setIsHovered(true);
-    if (videoRef.current && isLoaded) {
-      videoRef.current.play().catch(() => { });
-    }
+    if (!showPreview) return;
+    
+    // Delay preview to avoid accidental triggers
+    hoverTimeoutRef.current = setTimeout(() => {
+      setIsHovered(true);
+      setIsPlaying(true);
+    }, 500);
   };
 
   const handleMouseLeave = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
     setIsHovered(false);
-    if (videoRef.current) {
-      videoRef.current.pause();
+    setIsPlaying(false);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onClick?.(video);
     }
   };
 
   const toggleMute = (e) => {
     e.stopPropagation();
-    if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted;
-      setIsMuted(videoRef.current.muted);
-    }
+    setIsMuted(!isMuted);
   };
 
   const formatViews = (count) => {
-    if (count >= 1000000) {
-      return (count / 1000000).toFixed(1) + 'M';
-    } else if (count >= 1000) {
-      return (count / 1000).toFixed(1) + 'K';
-    }
-    return count?.toString() || '0';
+    if (!count || count === 0) return "No views";
+    if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M views`;
+    if (count >= 1000) return `${(count / 1000).toFixed(1)}K views`;
+    return `${count} views`;
   };
 
-  const getTimeAgo = (date) => {
+  const formatDate = (date) => {
+    if (!date) return "";
+    const d = new Date(date);
     const now = new Date();
-    const uploadTime = new Date(date);
-    const diffTime = Math.abs(now - uploadTime);
+    const diffTime = Math.abs(now - d);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
-    if (diffDays < 7) {
-      return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-    } else if (diffDays < 30) {
-      const weeks = Math.floor(diffDays / 7);
-      return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
-    } else if (diffDays < 365) {
-      const months = Math.floor(diffDays / 30);
-      return `${months} month${months > 1 ? 's' : ''} ago`;
-    } else {
-      const years = Math.floor(diffDays / 365);
-      return `${years} year${years > 1 ? 's' : ''} ago`;
-    }
+    if (diffDays === 1) return "1 day ago";
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
+    if (diffDays < 365) return `${Math.ceil(diffDays / 30)} months ago`;
+    return `${Math.ceil(diffDays / 365)} years ago`;
   };
 
+  const getThumbnailUrl = () => {
+    return bestThumbnail || `https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg`;
+  };
+
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const cardClasses = `
+    group cursor-pointer transition-all duration-300 ease-in-out
+    ${layout === 'list' ? 'flex gap-4 p-4' : 'flex flex-col'}
+    ${isHovered ? 'transform scale-105 shadow-2xl' : 'hover:shadow-lg'}
+    bg-white rounded-lg border border-gray-200 hover:border-gray-300
+    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+    ${className}
+  `;
+
+  const thumbnailClasses = `
+    relative overflow-hidden rounded-lg bg-gray-100
+    ${layout === 'list' ? 'w-48 h-28 flex-shrink-0' : 'w-full aspect-video'}
+  `;
+
   return (
-    <div
-      onClick={() => onClick(video)}
+    <article
+      className={cardClasses}
+      onClick={() => onClick?.(video)}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      style={{
-        display: 'flex',
-        backgroundColor: '#ffffff',
-        borderRadius: '12px',
-        marginBottom: '16px',
-        cursor: 'pointer',
-        transition: 'all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1)',
-        transform: isHovered ? 'translateY(-1px)' : 'translateY(0)',
-        boxShadow: isHovered 
-          ? '0 8px 25px rgba(0, 0, 0, 0.12), 0 4px 10px rgba(0, 0, 0, 0.08)' 
-          : '0 2px 8px rgba(0, 0, 0, 0.04)',
-        border: '1px solid',
-        borderColor: isHovered ? 'rgba(0, 0, 0, 0.08)' : 'transparent',
-        padding: '0',
-        overflow: 'hidden',
-        maxWidth: '100%',
-        minHeight: '94px'
-      }}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="button"
+      aria-label={`Play video: ${title}`}
     >
-      {/* Video Thumbnail Container */}
-      <div style={{
-        width: '168px',
-        height: '94px',
-        flexShrink: 0,
-        backgroundColor: '#f8f9fa',
-        borderRadius: '8px',
-        margin: '12px',
-        position: 'relative',
-        overflow: 'hidden',
-        border: '1px solid rgba(0, 0, 0, 0.06)'
-      }}>
+      {/* Thumbnail Container */}
+      <div className={thumbnailClasses}>
         {/* Thumbnail Image */}
-        {!isHovered && !imageError && (
+        {!imageError && (
           <img
-            src={thumbnail}
-            alt={title}
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              borderRadius: '8px'
-            }}
+            src={getThumbnailUrl()}
+            alt={`Thumbnail for ${title}`}
+            className="w-full h-full object-cover transition-opacity duration-300"
             onError={() => setImageError(true)}
+            loading="lazy"
           />
         )}
 
         {/* Fallback for missing thumbnail */}
-        {(imageError || !thumbnail) && !isHovered && (
-          <div style={{
-            width: '100%',
-            height: '100%',
-            backgroundColor: '#f1f3f4',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '24px',
-            color: '#5f6368',
-            borderRadius: '8px'
-          }}>
-            🎥
+        {imageError && (
+          <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400">
+            <Play size={48} />
           </div>
         )}
 
-        {/* Video Element for Preview */}
-        <video
-          ref={videoRef}
-          src={videoUrl}
-          muted={isMuted}
-          playsInline
-          loop
-          onLoadedData={() => setIsLoaded(true)}
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            opacity: isHovered ? 1 : 0,
-            transition: 'opacity 0.3s ease',
-            borderRadius: '8px'
-          }}
-        />
+        {/* YouTube Embed Preview */}
+        {isHovered && showPreview && isPlaying && (
+          <div className="absolute inset-0 bg-black">
+            <iframe
+              src={`${embedUrl}?autoplay=1&mute=${isMuted ? 1 : 0}&controls=0&modestbranding=1&rel=0&playsinline=1&start=10`}
+              title={`Preview of ${title}`}
+              className="w-full h-full border-0"
+              allow="autoplay; encrypted-media"
+              loading="lazy"
+            />
+          </div>
+        )}
 
         {/* Play Button Overlay */}
         {!isHovered && (
-          <div style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            borderRadius: '50%',
-            width: '32px',
-            height: '32px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'all 0.2s ease'
-          }}>
-            <Play size={16} color="white" style={{ marginLeft: '2px' }} />
+          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div className="bg-red-600 text-white rounded-full p-3 transform scale-100 group-hover:scale-110 transition-transform duration-200">
+              <Play size={20} fill="currentColor" />
+            </div>
           </div>
         )}
 
         {/* Duration Badge */}
-        <div style={{
-          position: 'absolute',
-          bottom: '4px',
-          right: '4px',
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          color: 'white',
-          padding: '2px 6px',
-          borderRadius: '4px',
-          fontSize: '11px',
-          fontWeight: '500',
-          letterSpacing: '0.5px',
-          fontFamily: 'monospace'
-        }}>
-          {duration || '0:00'}
-        </div>
+        {formattedDuration && formattedDuration !== "N/A" && (
+          <div className="absolute bottom-2 right-2 bg-black bg-opacity-80 text-white text-xs px-2 py-1 rounded flex items-center gap-1">
+            <Clock size={10} />
+            {formattedDuration}
+          </div>
+        )}
+
+        {/* Category Badge */}
+        {category && (
+          <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+            {category}
+          </div>
+        )}
 
         {/* Mute Toggle Button */}
-        {isHovered && (
+        {isHovered && showPreview && (
           <button
             onClick={toggleMute}
-            style={{
-              position: 'absolute',
-              top: '6px',
-              right: '6px',
-              backgroundColor: 'rgba(0, 0, 0, 0.7)',
-              border: 'none',
-              borderRadius: '50%',
-              width: '28px',
-              height: '28px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s ease',
-              zIndex: 10
-            }}
+            className="absolute bottom-2 left-2 bg-black bg-opacity-60 text-white p-2 rounded-full hover:bg-opacity-80 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white"
+            aria-label={isMuted ? "Unmute preview" : "Mute preview"}
           >
-            {isMuted ? <VolumeX size={12} color="white" /> : <Volume2 size={12} color="white" />}
+            {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
           </button>
         )}
       </div>
 
       {/* Video Info Container */}
-      <div style={{
-        flex: 1,
-        padding: '12px 16px 12px 0',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        minHeight: '94px'
-      }}>
+      <div className={`flex-1 ${layout === 'list' ? '' : 'p-4'}`}>
         {/* Title */}
-        <div>
-          <h3 style={{
-            fontSize: '16px',
-            lineHeight: '1.3',
-            color: '#1a0dab',
-            margin: '0 0 4px 0',
-            fontWeight: '400',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            textDecoration: isHovered ? 'underline' : 'none',
-            cursor: 'pointer'
-          }}>
-            {title}
-          </h3>
-          
-          {/* Source and Meta Info */}
-          <div style={{
-            fontSize: '14px',
-            color: '#5f6368',
-            lineHeight: '1.4',
-            marginBottom: '2px'
-          }}>
-            <span style={{ 
-              color: '#202124',
-              marginRight: '8px'
-            }}>
-              {author}
-            </span>
-            <span style={{ marginRight: '8px' }}>•</span>
-            <span>{formatViews(views)} views</span>
-            <span style={{ marginLeft: '8px', marginRight: '8px' }}>•</span>
-            <span>{getTimeAgo(uploadDate)}</span>
+        <h3 className="font-semibold text-gray-900 line-clamp-2 mb-2 group-hover:text-blue-600 transition-colors duration-200">
+          {title}
+        </h3>
+
+        {/* Channel and Meta Info */}
+        <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+          <span className="font-medium text-gray-700">{channelTitle}</span>
+          <span>•</span>
+          <div className="flex items-center gap-1">
+            <Eye size={12} />
+            <span>{formatViews(viewCount + localViews)}</span>
+          </div>
+          <span>•</span>
+          <div className="flex items-center gap-1">
+            <Calendar size={12} />
+            <span>{formatDate(publishedAt)}</span>
           </div>
         </div>
 
-        {/* Description */}
-        <div style={{
-          fontSize: '14px',
-          color: '#5f6368',
-          lineHeight: '1.4',
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden',
-          marginTop: '4px'
-        }}>
-          {description}
-        </div>
+        {/* Description (only in list layout) */}
+        {layout === 'list' && description && (
+          <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+            {description}
+          </p>
+        )}
 
-        {/* Tags and Category */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          marginTop: '8px',
-          flexWrap: 'wrap'
-        }}>
-          {category && (
-            <span style={{
-              backgroundColor: '#f8f9fa',
-              color: '#5f6368',
-              padding: '2px 8px',
-              borderRadius: '12px',
-              fontSize: '12px',
-              fontWeight: '500',
-              border: '1px solid #e8eaed'
-            }}>
-              {category}
+        {/* Tags and Research Area */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {researchArea && researchArea !== 'Other' && (
+            <span className="inline-flex items-center gap-1 bg-purple-100 text-purple-700 text-xs px-2 py-1 rounded-full">
+              <Tag size={10} />
+              {researchArea}
             </span>
           )}
-          {tags.slice(0, 2).map((tag, i) => (
+          {tags.slice(0, layout === 'list' ? 3 : 2).map((tag, i) => (
             <span
               key={i}
-              style={{
-                backgroundColor: '#e8f0fe',
-                color: '#1a73e8',
-                padding: '2px 8px',
-                borderRadius: '12px',
-                fontSize: '12px',
-                fontWeight: '500'
-              }}
+              className="inline-flex items-center bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full"
             >
               #{tag}
             </span>
           ))}
+          {tags.length > (layout === 'list' ? 3 : 2) && (
+            <span className="text-xs text-gray-400">
+              +{tags.length - (layout === 'list' ? 3 : 2)} more
+            </span>
+          )}
         </div>
       </div>
 
       {/* More Options Button */}
-      <div style={{
-        padding: '12px 16px 12px 0',
-        display: 'flex',
-        alignItems: 'flex-start'
-      }}>
+      <div className={`${layout === 'list' ? 'self-start' : 'absolute top-2 right-2'}`}>
         <button
-          onClick={(e) => e.stopPropagation()}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: '8px',
-            borderRadius: '50%',
-            color: '#5f6368',
-            transition: 'background-color 0.2s ease',
-            opacity: isHovered ? 1 : 0.7
+          onClick={(e) => {
+            e.stopPropagation();
+            // Handle more options menu
           }}
-          onMouseEnter={(e) => e.target.style.backgroundColor = '#f1f3f4'}
-          onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          aria-label="More options"
         >
           <MoreVertical size={16} />
         </button>
       </div>
-    </div>
+    </article>
   );
 };
 
