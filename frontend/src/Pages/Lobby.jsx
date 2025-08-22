@@ -71,36 +71,8 @@ const Lobby = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            DeepMinds Research Lab
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Advancing the frontiers of Machine Learning and Artificial Intelligence at 
-            Mbarara University of Science and Technology
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link
-              to="/publications"
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2"
-            >
-              <FileText size={20} />
-              Explore Research
-            </Link>
-            <Link
-              to="/members"
-              className="bg-white text-gray-700 px-6 py-3 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors duration-200 flex items-center gap-2"
-            >
-              <Users size={20} />
-              Meet Our Team
-            </Link>
-          </div>
-        </div>
-
         {/* Stats Section */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Lab Overview</h2>
           {overviewLoading ? (
             <StatsSkeleton />
           ) : (
