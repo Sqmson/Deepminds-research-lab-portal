@@ -80,18 +80,6 @@ const Announcements = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="bg-blue-500 p-3 rounded-lg">
-              <Bell className="text-white" size={24} />
-            </div>
-            <h1 className="text-4xl font-bold text-gray-900">Announcements</h1>
-          </div>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Stay updated with the latest news, events, and important information from DeepMinds Research Lab.
-          </p>
-        </div>
 
         {/* Search and Filters */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">

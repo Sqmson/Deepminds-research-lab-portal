@@ -27,7 +27,7 @@ const NavLinks = ({ createRipple, isMobile = false, onLinkClick }) => {
       >
         Publications
       </Link>
-      <Link
+      {/* <Link
         to="/members"
         className={baseClass}
         onClick={e => {
@@ -36,7 +36,7 @@ const NavLinks = ({ createRipple, isMobile = false, onLinkClick }) => {
         }}
       >
         Members
-      </Link>
+      </Link> */}
       <Link
         to="/videos"
         className={baseClass}
@@ -47,7 +47,7 @@ const NavLinks = ({ createRipple, isMobile = false, onLinkClick }) => {
       >
         Videos
       </Link>
-      <Link
+      {/* <Link
         to="/about"
         className={baseClass}
         onClick={e => {
@@ -56,7 +56,7 @@ const NavLinks = ({ createRipple, isMobile = false, onLinkClick }) => {
         }}
       >
         About
-      </Link>
+      </Link> */}
       {isMobile && (
         <>
           <Link
