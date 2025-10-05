@@ -1,14 +1,4 @@
-<?php
-// Load .env variables for frontend
-$env = [];
-if (file_exists(__DIR__ . '.env')) {
-    foreach (file(__DIR__ . '.env') as $line) {
-        if (preg_match('/^([A-Z0-9_]+)=(.*)$/', trim($line), $matches)) {
-            $env[$matches[1]] = trim($matches[2], '"');
-        }
-    }
-}
-?>
+
 <header style="background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; relative;">
     <!-- Expose .env to JS -->
     <script>

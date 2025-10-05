@@ -18,6 +18,54 @@ $pageTitles = [
 ];
 
 $currentTitle = $pageTitles[$page] ?? 'DeepMinds Research Lab';
+
+// If the upload article form posts to this page, include the backend handler before rendering
+if ($page === 'upload_article' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $backendHandler = __DIR__ . '/../backend/api/upload_article.php';
+    $alt = '/var/www/html/deepminds/backend/api/upload_article.php';
+    if (file_exists($alt)) $backendHandler = $alt;
+    if (file_exists($backendHandler)) {
+        require_once $backendHandler;
+        // backend handler will redirect on success, so exit to avoid double render
+        exit;
+    } else {
+        // log missing handler
+        error_log('Upload article backend handler not found: ' . $backendHandler);
+    }
+}
+
+// Attempt to load announcements from backend MongoDB; if unavailable, fall back to a local JSON file
+$announcements = [];
+try {
+    require_once __DIR__ . '/../backend/config/mongo.php';
+    $db = connectMongoDB();
+    // Only proceed if the client supports selectCollection signature (some environments may differ)
+    if (method_exists($db, 'selectCollection')) {
+        $collection = $db->selectCollection('announcements');
+        $cursor = $collection->find([], ['sort' => ['created_at' => -1]]);
+        foreach ($cursor as $doc) {
+            // Convert BSON document to PHP array for template compatibility
+            if (is_array($doc)) {
+                $announcements[] = $doc;
+            } elseif (is_object($doc) && method_exists($doc, 'bsonSerialize')) {
+                $announcements[] = $doc->bsonSerialize();
+            } else {
+                // Try cast
+                $announcements[] = (array)$doc;
+            }
+        }
+    }
+} catch (Throwable $e) {
+    // Fallback to JSON file produced by the upload handler
+    $fallbackFile = __DIR__ . '/data/announcements.json';
+    if (is_file($fallbackFile)) {
+        $contents = @file_get_contents($fallbackFile);
+        $arr = $contents ? json_decode($contents, true) : [];
+        if (is_array($arr)) {
+            $announcements = $arr;
+        }
+    }
+}
 ?>
 
 <!DOCTYPE html>

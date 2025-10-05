@@ -5,7 +5,7 @@
             <!-- About Section -->
             <div>
                 <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                    <img src="../public/logo-7402580_1920.png" alt="DMRLab Logo" style="width: 32px; height: 32px; margin-right: 10px;" />
+                    <img src="public/logo-7402580_1920.png" alt="DMRLab Logo" style="width: 32px; height: 32px; margin-right: 10px;" />
                     <div>
                         <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: #343a40;">DMRLab</h3>
                         <p style="margin: 0; font-size: 12px; color: #6c757d;">Research & Innovation</p>

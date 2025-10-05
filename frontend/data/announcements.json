@@ -1,0 +1,12 @@
+[
+    {
+        "title": "Direct Test Upload 4",
+        "description": "Direct upload to backend 4",
+        "created_at": "2025-10-05T17:13:29+02:00",
+        "file": {
+            "name": "testdoc.LftuhS.pdf",
+            "url": "/uploads/testdoc.LftuhS.pdf",
+            "type": "application/pdf"
+        }
+    }
+]

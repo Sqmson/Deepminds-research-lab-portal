@@ -379,12 +379,18 @@ async function loadArticles() {
     `;
 
     try {
-        const articles = await window.api.getArticles({
-            ...currentFilters,
-            page: currentPage,
-            limit: 12 // Show 12 articles per page
-        });
-
+        let articles = [];
+        try {
+            articles = await window.api.getArticles({
+                ...currentFilters,
+                page: currentPage,
+                limit: 12 // Show 12 articles per page
+            });
+        } catch (apiErr) {
+            console.error('API articles fetch failed:', apiErr);
+            throw apiErr; // Bubble up so the UI shows the failure state
+        }
+        }
         displayArticles(articles);
         updatePagination(articles.length);
 

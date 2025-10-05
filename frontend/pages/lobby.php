@@ -47,40 +47,72 @@
                         </svg>
                     </button>
                 </div>
-                <div style="padding: 20px;">
-                    <div id="announcements-container">
-                        <!-- Announcements will be loaded here by JavaScript -->
-                        <div style="padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px solid #f3f4f6;">
-                            <div style="display: flex; align-items: flex-start; gap: 12px;">
-                                <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #f59e0b; margin-top: 6px; flex-shrink: 0;"></div>
-                                <div style="flex: 1;">
-                                    <h4 style="margin: 0 0 4px 0; font-size: 0.95rem; font-weight: 600; color: #1f2937;">Monthly Lab Meeting - Friday 2PM</h4>
-                                    <p style="margin: 0 0 6px 0; font-size: 0.85rem; color: #6b7280; line-height: 1.4;">Join us for updates and collaborative discussions...</p>
-                                    <div style="font-size: 0.8rem; color: #9ca3af; display: flex; align-items: center; gap: 4px;">
-                                        <svg style="width: 12px; height: 12px;" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                                        </svg>
-                                        5 days ago
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div id="announcements-container" data-server-rendered="1">
+                        <?php if (!empty($announcements)): ?>
+                            <?php foreach ($announcements as $a): ?>
+                                <div style="margin-bottom: 1.5rem;">
+                                    <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                        <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #10b981; margin-top: 6px; flex-shrink: 0;"></div>
+                                        <div style="flex: 1;">
+                                            <h4 style="margin: 0 0 4px 0; font-size: 0.95rem; font-weight: 600; color: #1f2937;">
+                                                <?php echo htmlspecialchars($a['title'] ?? 'Untitled'); ?>
+                                            </h4>
+                                            <p style="margin: 0 0 6px 0; font-size: 0.85rem; color: #6b7280; line-height: 1.4;">
+                                                <?php echo htmlspecialchars($a['description'] ?? ''); ?>
+                                            </p>
 
-                        <div>
-                            <div style="display: flex; align-items: flex-start; gap: 12px;">
-                                <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #10b981; margin-top: 6px; flex-shrink: 0;"></div>
-                                <div style="flex: 1;">
-                                    <h4 style="margin: 0 0 4px 0; font-size: 0.95rem; font-weight: 600; color: #1f2937;">Welcome New Research Assistant</h4>
-                                    <p style="margin: 0 0 6px 0; font-size: 0.85rem; color: #6b7280; line-height: 1.4;">Please welcome samson to our growing team...</p>
-                                    <div style="font-size: 0.8rem; color: #9ca3af; display: flex; align-items: center; gap: 4px;">
-                                        <svg style="width: 12px; height: 12px;" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                                        </svg>
-                                        1 week ago
+                                            <?php if (!empty($a['file'])): ?>
+                                                <div style="margin-bottom: 6px;">
+                                                    <a href="<?php echo htmlspecialchars($a['file']['url'] ?? '#'); ?>" download style="font-size: 0.85rem; color: #2563eb; text-decoration: none;">
+                                                        📥 Download <?php echo htmlspecialchars($a['file']['name'] ?? 'file'); ?>
+                                                    </a>
+                                                </div>
+                                            <?php endif; ?>
+
+                                            <div style="font-size: 0.8rem; color: #9ca3af; display: flex; align-items: center; gap: 4px;">
+                                                <svg style="width: 12px; height: 12px;" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                                </svg>
+                                                <?php
+                                                    // Normalize created_at to DateTime
+                                                    try {
+                                                        if (isset($a['created_at'])) {
+                                                            if (is_object($a['created_at']) && method_exists($a['created_at'], 'toDateTime')) {
+                                                                $createdAt = $a['created_at']->toDateTime();
+                                                            } elseif (is_string($a['created_at'])) {
+                                                                $createdAt = new DateTime($a['created_at']);
+                                                            } elseif (is_array($a['created_at']) && isset($a['created_at']['$date'])) {
+                                                                $createdAt = new DateTime($a['created_at']['$date']);
+                                                            } else {
+                                                                // Fallback to now
+                                                                $createdAt = new DateTime();
+                                                            }
+                                                        } else {
+                                                            $createdAt = new DateTime();
+                                                        }
+                                                    } catch (Exception $ex) {
+                                                        $createdAt = new DateTime();
+                                                    }
+                                                    $diff = (new DateTime())->diff($createdAt);
+                                                    if ($diff->days === 0) {
+                                                        echo 'Today';
+                                                    } elseif ($diff->days === 1) {
+                                                        echo '1 day ago';
+                                                    } else {
+                                                        echo $diff->days . ' days ago';
+                                                    }
+                                                ?>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="loading-container">
+                                <p>No announcements yet.</p>
                             </div>
-                        </div>
+                        <?php endif; ?>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -362,6 +394,11 @@ function loadAnnouncements() {
     const container = document.getElementById('announcements-container');
     if (!container) {
         console.warn('Announcements container not found');
+        return;
+    }
+
+    // Don't overwrite server-rendered announcements
+    if (container.dataset && container.dataset.serverRendered) {
         return;
     }
 

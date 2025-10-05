@@ -1,0 +1,13 @@
+[
+  {
+    "_id": "sample1",
+    "title": "Sample Article",
+    "excerpt": "This is a sample article created for testing.",
+    "content": "Full content of the sample article.",
+    "author": "Admin",
+    "category": "Testing",
+    "tags": ["test","sample"],
+    "image_url": "/deepminds/frontend/public/logo-7402580_1920.png",
+    "date": "2025-10-05T00:00:00+00:00"
+  }
+]

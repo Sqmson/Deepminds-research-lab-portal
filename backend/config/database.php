@@ -1,44 +1,31 @@
 <?php
-require_once __DIR__ . '/../vendor/autoload.php';
-
-use MongoDB\Client;
-use MongoDB\Driver\Exception\Exception as MongoException;
+require_once __DIR__ . '/mongo.php';
 
 class Database {
     private static $instance = null;
     private $client;
-    private $database;
+    private $dbName;
 
     private function __construct() {
-        try {
-            $mongoUri = getenv('MONGO_URI') ?: 'mongodb://localhost:27017';
-            $databaseName = getenv('DB_NAME') ?: 'deepminds_research_lab';
-
-            $this->client = new Client($mongoUri);
-            $this->database = $this->client->selectDatabase($databaseName);
-
-            // Test connection
-            $this->database->listCollections();
-
-        } catch (MongoException $e) {
-            error_log('MongoDB connection error: ' . $e->getMessage());
-            throw new Exception('Database connection failed: ' . $e->getMessage());
-        }
+        $this->client = connectMongoDB();
+        // Use DB_NAME from env or default
+        $this->dbName = getenv('MONGO_DB') ?: ($_ENV['MONGO_DB'] ?? 'deepminds');
     }
 
     public static function getInstance() {
         if (self::$instance === null) {
-            self::$instance = new self();
+            self::$instance = new Database();
         }
         return self::$instance;
     }
 
-    public function getDatabase() {
-        return $this->database;
+    public function getClient() {
+        return $this->client;
     }
 
-    public function getCollection($collectionName) {
-        return $this->database->selectCollection($collectionName);
+    public function getCollection($name) {
+        return $this->client->{$this->dbName}->{$name};
     }
 }
+
 ?>
