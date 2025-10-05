@@ -10,11 +10,11 @@ if (!in_array($page, $allowedPages)) {
 
 // Set page title based on current page
 $pageTitles = [
-    'lobby' => 'DeepMinds Research Lab',
-    'articles' => 'Articles - DeepMinds Research Lab',
-    'article' => 'Article - DeepMinds Research Lab',
-    'videos' => 'Videos - DeepMinds Research Lab',
-    'video' => 'Video - DeepMinds Research Lab'
+    'lobby' => 'Deepminds Research Lab',
+    'articles' => 'Deepminds Research Lab - Articles',
+    'article' => 'Deepminds Research Lab - Article',
+    'videos' => 'Deepminds Research Lab - videos',
+    'video' => 'Deepminds Research Lab - video'
 ];
 
 $currentTitle = $pageTitles[$page] ?? 'DeepMinds Research Lab';
@@ -27,16 +27,16 @@ $currentTitle = $pageTitles[$page] ?? 'DeepMinds Research Lab';
     <title><?php echo htmlspecialchars($currentTitle); ?></title>
 
     <!-- Preload critical resources -->
-    <link rel="preload" href="/css/global.css" as="style">
+    <link rel="preload" href="/css/global.css?v=<?php echo time(); ?>" as="style">
     <link rel="preload" href="/js/api.js" as="script">
     <link rel="preload" href="/js/ui.js" as="script">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/logo-7402580_1920.png">
+    <link rel="icon" type="image/png" href="/frontend/public/logo-7402580_1920.png">
 
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="/css/global.css">
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/global.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="/css/style.css?v=<?php echo time(); ?>">
 
     <!-- Open Graph meta tags for social sharing -->
     <meta property="og:title" content="<?php echo htmlspecialchars($currentTitle); ?>">
@@ -46,7 +46,7 @@ $currentTitle = $pageTitles[$page] ?? 'DeepMinds Research Lab';
 </head>
 <body>
     <div class="app">
-        <?php include 'header.php'; ?>
+        <?php include 'pages/components/header.php'; ?>
 
         <main class="main-content">
             <?php
@@ -60,16 +60,16 @@ $currentTitle = $pageTitles[$page] ?? 'DeepMinds Research Lab';
             ?>
         </main>
 
-        <?php include 'footer.php'; ?>
+        <?php include 'pages/components/footer.php'; ?>
     </div>
 
     <!-- JavaScript modules -->
-    <script src="/js/api.js"></script>
-    <script src="/js/ui.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
 
     <!-- Page-specific JavaScript -->
     <?php
-    $pageJsFile = "/js/pages/{$page}.js";
+    $pageJsFile = "js/pages/{$page}.js";
     if (file_exists(__DIR__ . $pageJsFile)) {
         echo "<script src=\"{$pageJsFile}\"></script>";
     }
@@ -79,7 +79,7 @@ $currentTitle = $pageTitles[$page] ?? 'DeepMinds Research Lab';
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js', { scope: '/' })
+                navigator.serviceWorker.register('js/sw.js', { scope: '/' })
                     .then(function(registration) {
                         console.log('ServiceWorker registered successfully:', registration.scope);
                     })

@@ -1,31 +1,4 @@
 <div class="articles-page">
-    <!-- Page Header -->
-    <div class="page-header">
-        <h1>Research Articles</h1>
-        <p>Explore our latest research publications and articles</p>
-    </div>
-
-    <!-- Filters and Search -->
-    <div class="filters-section">
-        <div class="search-container">
-            <input
-                type="text"
-                id="search-input"
-                placeholder="Search articles..."
-                class="form-input"
-            >
-            <button id="search-btn" class="btn">Search</button>
-        </div>
-
-        <div class="filters-container">
-            <select id="category-filter" class="form-select">
-                <option value="all">All Categories</option>
-                <!-- Categories will be loaded dynamically -->
-            </select>
-        </div>
-    </div>
-
-    <!-- Articles Grid -->
     <div id="articles-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
         <!-- Articles will be loaded here -->
         <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
@@ -335,16 +308,7 @@ function initializeArticlesPage() {
 }
 
 function setupEventListeners() {
-    // Search functionality
-    const searchInput = document.getElementById('search-input');
-    const searchBtn = document.getElementById('search-btn');
-
-    searchBtn.addEventListener('click', handleSearch);
-    searchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            handleSearch();
-        }
-    });
+    // No search input, only category filter
 
     // Category filter
     document.getElementById('category-filter').addEventListener('change', function(e) {
@@ -555,10 +519,5 @@ function updatePagination(articleCount) {
     }
 }
 
-function handleSearch() {
-    const searchInput = document.getElementById('search-input');
-    currentFilters.search = searchInput.value.trim();
-    currentPage = 1;
-    loadArticles();
-}
+// No search logic
 </script>

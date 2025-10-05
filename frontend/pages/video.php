@@ -1,10 +1,6 @@
 <div class="video-page">
     <div id="video-container">
         <!-- Video content will be loaded here -->
-        <div class="loading-container">
-            <div class="loading"></div>
-            <p>Loading video...</p>
-        </div>
     </div>
 </div>
 

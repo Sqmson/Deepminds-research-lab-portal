@@ -1,10 +1,6 @@
 <div class="article-page">
     <div id="article-container">
         <!-- Article content will be loaded here -->
-        <div class="loading-container">
-            <div class="loading"></div>
-            <p>Loading article...</p>
-        </div>
     </div>
 </div>
 

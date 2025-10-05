@@ -1,8 +1,18 @@
-// API Module - Handles all API communications
+function getEnvVariable(key, fallback = '') {
+    // Try window.__ENV__ (set by PHP in header.php)
+    if (window.__ENV__ && window.__ENV__[key]) {
+        return window.__ENV__[key];
+    }
+    // Fallback: try to read from <meta> tag
+    const meta = document.querySelector(`meta[name="env-${key}"]`);
+    if (meta) return meta.getAttribute('content');
+    return fallback;
+}
+
 class ApiService {
     constructor() {
         // Use backend server URL for API calls
-        this.baseURL = 'http://localhost:8002';
+        this.baseURL = getEnvVariable('API_BASE_URL', 'http://localhost:8002');
         this.cache = new Map();
         this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
     }

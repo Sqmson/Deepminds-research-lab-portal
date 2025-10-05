@@ -1,24 +1,5 @@
 <div class="videos-page">
-    <!-- Page Header -->
-    <div class="page-header">
-        <h1>Video Lectures</h1>
-        <p>Watch our educational content and research presentations</p>
-    </div>
-
-    <!-- Search -->
-    <div class="search-section">
-        <div class="search-container">
-            <input
-                type="text"
-                id="video-search-input"
-                placeholder="Search videos..."
-                class="form-input"
-            >
-            <button id="video-search-btn" class="btn">Search</button>
-        </div>
-    </div>
-
-    <!-- Videos Grid -->
+<!-- Videos Grid -->
     <div id="videos-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
         <!-- Videos will be loaded here -->
         <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
@@ -272,16 +253,7 @@ function initializeVideosPage() {
 }
 
 function setupVideoEventListeners() {
-    // Search functionality
-    const searchInput = document.getElementById('video-search-input');
-    const searchBtn = document.getElementById('video-search-btn');
-
-    searchBtn.addEventListener('click', handleVideoSearch);
-    searchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            handleVideoSearch();
-        }
-    });
+    // No search input, universal search only
 
     // Load more button
     document.getElementById('load-more-videos-btn').addEventListener('click', function() {
@@ -490,13 +462,7 @@ function updateVideoLoadMore(videoCount) {
     }
 }
 
-function handleVideoSearch() {
-    const searchInput = document.getElementById('video-search-input');
-    currentVideoSearch = searchInput.value.trim();
-    currentVideoPage = 1;
-    hasMoreVideos = true;
-    loadVideos();
-}
+// No search logic
 
 function openVideo(videoId) {
     // Navigate to video page

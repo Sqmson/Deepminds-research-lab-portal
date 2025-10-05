@@ -1,5 +1,7 @@
 # dotenv files
 .env
+backend/.env
+frontend/.env
 
 # MongoDB dumps
 dump/
@@ -12,4 +14,3 @@ cloudinary_config.js
 
 # OS files
 .DS_Store
-DIAGNOSTIC_REPORT.md

@@ -1,4 +1,19 @@
+<?php
+// Load .env variables for frontend
+$env = [];
+if (file_exists(__DIR__ . '.env')) {
+    foreach (file(__DIR__ . '.env') as $line) {
+        if (preg_match('/^([A-Z0-9_]+)=(.*)$/', trim($line), $matches)) {
+            $env[$matches[1]] = trim($matches[2], '"');
+        }
+    }
+}
+?>
 <header style="background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; relative;">
+    <!-- Expose .env to JS -->
+    <script>
+    window.__ENV__ = <?php echo json_encode($env); ?>;
+    </script>
     <style>
         @keyframes ripple-animation {
             0% {
@@ -19,49 +34,43 @@
     <div style="max-width: 1280px; margin: 0 auto; padding: 0 1rem; display: flex; justify-content: space-between; align-items: center; height: 4rem;">
         <div class="logo-section">
             <a href="?page=lobby" class="logo-link" onclick="createRipple(event)" style="display: flex; align-items: center; space-x-3; text-decoration: none; color: #1f2937; font-weight: 600; font-size: 1.25rem;">
-                <img src="../public/logo-7402580_1920.png" alt="DeepMinds Research Lab" style="width: 2rem; height: 2rem; margin-right: 0.5rem;" loading="lazy">
+                <img src="../../public/logo-7402580_1920.png" alt="Deepminds Research Lab" style="width: 2rem; height: 2rem; margin-right: 0.5rem;" loading="lazy">
                 <div style="display: flex; flex-direction: column;">
-                    <h1 style="margin: 0; font-size: 1.25rem; font-weight: 600; color: #1f2937; tracking-tight;">DeepsMinds Research Lab</h1>
+                    <h1 style="margin: 0; font-size: 1.25rem; font-weight: 600; color: #1f2937; tracking-tight;">Deepminds Research Lab</h1>
                     <span style="font-size: 0.75rem; color: #6b7280; font-weight: 500; tracking-wide;">(DMRLAb)</span>
                 </div>
             </a>
         </div>
 
-        <!-- Desktop Navigation -->
-        <nav style="display: none;" class="nav-desktop md:flex items-center space-x-8">
+        <!-- Desktop Navigation + Universal Search -->
+        <nav class="nav-desktop md:flex items-center space-x-8" style="display: flex; align-items: center; gap: 2rem;">
             <ul style="display: flex; list-style: none; margin: 0; padding: 0; gap: 2rem;">
                 <li>
-                    <a href="?page=lobby" class="nav-link" onclick="createRipple(event)" style="color: #4b5563; text-decoration: none; font-weight: 500; transition: color 0.2s ease; position: relative; overflow: hidden; padding: 0.5rem 0.75rem; border-radius: 0.375rem; transition: all 0.2s ease;">Lobby</a>
+                    <a href="?page=lobby" class="nav-link" onclick="createRipple(event)">Lobby</a>
                 </li>
                 <li>
-                    <a href="?page=articles" class="nav-link" onclick="createRipple(event)" style="color: #4b5563; text-decoration: none; font-weight: 500; transition: color 0.2s ease; position: relative; overflow: hidden; padding: 0.5rem 0.75rem; border-radius: 0.375rem; transition: all 0.2s ease;">Articles</a>
+                    <a href="?page=articles" class="nav-link" onclick="createRipple(event)">Articles</a>
                 </li>
                 <li>
-                    <a href="?page=videos" class="nav-link" onclick="createRipple(event)" style="color: #4b5563; text-decoration: none; font-weight: 500; transition: color 0.2s ease; position: relative; overflow: hidden; padding: 0.5rem 0.75rem; border-radius: 0.375rem; transition: all 0.2s ease;">Video</a>
+                    <a href="?page=videos" class="nav-link" onclick="createRipple(event)">Video</a>
                 </li>
             </ul>
         </nav>
 
         <!-- Mobile Menu Button -->
-        <button onclick="toggleMobileMenu()" style="display: flex; flex-direction: column; background: none; border: none; cursor: pointer; padding: 0.5rem;" aria-label="Toggle menu">
-            <span style="width: 1.5rem; height: 2px; background: #374151; margin: 2px 0; transition: 0.3s;"></span>
-            <span style="width: 1.5rem; height: 2px; background: #374151; margin: 2px 0; transition: 0.3s;"></span>
-            <span style="width: 1.5rem; height: 2px; background: #374151; margin: 2px 0; transition: 0.3s;"></span>
+        <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Toggle menu">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
         </button>
     </div>
 
     <!-- Mobile Navigation -->
-    <nav id="mobileNav" style="display: none; background: white; border-top: 1px solid #e5e7eb; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <ul style="list-style: none; margin: 0; padding: 1rem;">
-            <li style="margin-bottom: 0.5rem;">
-                <a href="?page=lobby" onclick="createRipple(event)" style="display: block; padding: 0.75rem; color: #374151; text-decoration: none; border-radius: 0.375rem; transition: background-color 0.2s ease;">Lobby</a>
-            </li>
-            <li style="margin-bottom: 0.5rem;">
-                <a href="?page=articles" onclick="createRipple(event)" style="display: block; padding: 0.75rem; color: #374151; text-decoration: none; border-radius: 0.375rem; transition: background-color 0.2s ease;">Articles</a>
-            </li>
-            <li style="margin-bottom: 0.5rem;">
-                <a href="?page=videos" onclick="createRipple(event)" style="display: block; padding: 0.75rem; color: #374151; text-decoration: none; border-radius: 0.375rem; transition: background-color 0.2s ease;">Video</a>
-            </li>
+    <nav id="mobileNav" class="nav-mobile" style="display: none; background: white; border-top: 1px solid #e5e7eb; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <ul class="nav-list-mobile">
+            <li><a href="?page=lobby" class="nav-link-mobile" onclick="createRipple(event)">Lobby</a></li>
+            <li><a href="?page=articles" class="nav-link-mobile" onclick="createRipple(event)">Articles</a></li>
+            <li><a href="?page=videos" class="nav-link-mobile" onclick="createRipple(event)">Video</a></li>
         </ul>
     </nav>
 </header>
@@ -239,4 +248,5 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
 </script>
