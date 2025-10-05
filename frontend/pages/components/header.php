@@ -9,42 +9,35 @@ if (file_exists(__DIR__ . '.env')) {
     }
 }
 ?>
-<header style="background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; relative;">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DMRLab</title>
+    <link rel="stylesheet" href="frontend/css/header.css">
+</head>
+<body>
+<header class="header">
     <!-- Expose .env to JS -->
     <script>
     window.__ENV__ = <?php echo json_encode($env); ?>;
     </script>
-    <style>
-        @keyframes ripple-animation {
-            0% {
-                transform: scale(0);
-                opacity: 0.6;
-            }
-            100% {
-                transform: scale(2);
-                opacity: 0;
-            }
-        }
-        .nav-link {
-            position: relative;
-            overflow: hidden;
-        }
-    </style>
 
-    <div style="max-width: 1280px; margin: 0 auto; padding: 0 1rem; display: flex; justify-content: space-between; align-items: center; height: 4rem;">
+    <div class="header-container">
         <div class="logo-section">
-            <a data-page="lobby" class="logo-link" style="display: flex; align-items: center; space-x-3; text-decoration: none; color: #1f2937; font-weight: 600; font-size: 1.25rem;">
-                <img src="public/logo-7402580_1920.png" alt="x-icon" style="width: 2rem; height: 2rem; margin-right: 0.5rem;" loading="lazy">
-                <div style="display: flex; flex-direction: column;">
-                    <h1 style="margin: 0; font-size: 1.25rem; font-weight: 600; color: #1f2937; tracking-tight;">Deepminds Research Lab</h1>
-                    <span style="font-size: 0.75rem; color: #6b7280; font-weight: 500; tracking-wide;">(DMRLAb)</span>
+            <a data-page="lobby" class="logo-link">
+                <img src="public/logo-7402580_1920.png" alt="x-icon" class="logo-image" loading="lazy">
+                <div class="logo-text">
+                    <h1 class="logo-title">DeepMinds Research Lab</h1>
+                    <span class="logo-subtitle">(DMRLab)</span>
                 </div>
             </a>
         </div>
 
-        <!-- Desktop Navigation + Universal Search -->
-        <nav class="nav-desktop md:flex items-center space-x-8" style="display: flex; align-items: center; gap: 2rem;">
-            <ul style="display: flex; list-style: none; margin: 0; padding: 0; gap: 2rem;">
+        <!-- Desktop Navigation -->
+        <nav class="nav-desktop">
+            <ul class="nav-list">
                 <li>
                     <a data-page="lobby" class="nav-link">Lobby</a>
                 </li>
@@ -66,7 +59,7 @@ if (file_exists(__DIR__ . '.env')) {
     </div>
 
     <!-- Mobile Navigation -->
-    <nav id="mobileNav" class="nav-mobile" style="display: none; background: white; border-top: 1px solid #e5e7eb; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <nav id="mobileNav" class="nav-mobile">
         <ul class="nav-list-mobile">
             <li><a data-page="lobby" class="nav-link-mobile">Lobby</a></li>
             <li><a data-page="articles" class="nav-link-mobile">Articles</a></li>
@@ -74,149 +67,6 @@ if (file_exists(__DIR__ . '.env')) {
         </ul>
     </nav>
 </header>
-
-<style>
-/* Header-specific styles will be moved to components/header.css */
-.header {
-    background: white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-
-.header-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 4rem;
-}
-
-.logo-link {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    color: #1f2937;
-    font-weight: 600;
-    font-size: 1.25rem;
-}
-
-.logo-image {
-    height: 2rem;
-    width: auto;
-    margin-right: 0.5rem;
-}
-
-.nav-desktop .nav-list {
-    display: flex;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    gap: 2rem;
-}
-
-.nav-link {
-    color: #4b5563;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.nav-link:hover {
-    color: #2563eb;
-}
-
-.mobile-menu-btn {
-    display: none;
-    flex-direction: column;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0.5rem;
-}
-
-.hamburger-line {
-    width: 1.5rem;
-    height: 2px;
-    background: #374151;
-    margin: 2px 0;
-    transition: 0.3s;
-}
-
-.nav-mobile {
-    display: none;
-    background: white;
-    border-top: 1px solid #e5e7eb;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.nav-list-mobile {
-    list-style: none;
-    margin: 0;
-    padding: 1rem;
-}
-
-.nav-link-mobile {
-    display: block;
-    color: #4b5563;
-    text-decoration: none;
-    font-weight: 500;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid #f3f4f6;
-    transition: color 0.2s ease;
-}
-
-.nav-link-mobile:hover {
-    color: #2563eb;
-}
-
-/* Mobile styles */
-@media (max-width: 768px) {
-    .nav-desktop {
-        display: none;
-    }
-
-    .mobile-menu-btn {
-        display: flex;
-    }
-
-    .nav-mobile.show {
-        display: block;
-    }
-}
-
-/* Ripple effect */
-.nav-link[data-ripple],
-.mobile-menu-btn[data-ripple] {
-    position: relative;
-    overflow: hidden;
-}
-
-.ripple {
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(37, 99, 235, 0.3);
-    transform: scale(0);
-    animation: ripple-animation 0.8s linear;
-    pointer-events: none;
-}
-
-@keyframes ripple-animation {
-    0% {
-        transform: scale(0);
-        opacity: 0.6;
-    }
-    100% {
-        transform: scale(2);
-        opacity: 0;
-    }
-}
-</style>
 
 <script>
 // Mobile menu toggle functionality
@@ -243,10 +93,39 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Close mobile menu when clicking outside
     document.addEventListener('click', function(e) {
-        if (!mobileMenuBtn.contains(e.target) && !mobileNav.contains(e.target)) {
+        if (mobileNav && mobileMenuBtn && !mobileMenuBtn.contains(e.target) && !mobileNav.contains(e.target)) {
             mobileNav.classList.remove('show');
         }
     });
 });
 
+// Ripple effect functionality
+document.addEventListener('DOMContentLoaded', function() {
+    function createRipple(event) {
+        const button = event.currentTarget;
+        const circle = document.createElement('span');
+        const diameter = Math.max(button.clientWidth, button.clientHeight);
+        const radius = diameter / 2;
+
+        circle.style.width = circle.style.height = `${diameter}px`;
+        circle.style.left = `${event.clientX - button.getBoundingClientRect().left - radius}px`;
+        circle.style.top = `${event.clientY - button.getBoundingClientRect().top - radius}px`;
+        circle.classList.add('ripple');
+
+        const ripple = button.getElementsByClassName('ripple')[0];
+        if (ripple) {
+            ripple.remove();
+        }
+
+        button.appendChild(circle);
+    }
+
+    // Add ripple effect to navigation links
+    const navLinks = document.querySelectorAll('.nav-link, .nav-link-mobile, .mobile-menu-btn');
+    navLinks.forEach(link => {
+        link.addEventListener('click', createRipple);
+    });
+});
 </script>
+</body>
+</html>
