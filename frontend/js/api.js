@@ -2,7 +2,7 @@
 class ApiService {
     constructor() {
         // Use backend server URL for API calls
-        this.baseURL = 'http://localhost:8001';
+        this.baseURL = 'http://localhost:8002';
         this.cache = new Map();
         this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
     }

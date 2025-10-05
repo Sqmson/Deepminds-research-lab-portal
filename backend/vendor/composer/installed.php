@@ -3,7 +3,7 @@
         'name' => 'deepminds/research-lab',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '89f023e7f5ab825b017ea36987e73194f771c82a',
+        'reference' => '747760ca8c52cc94aff432aadce7addf44c357d4',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'deepminds/research-lab' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '89f023e7f5ab825b017ea36987e73194f771c82a',
+            'reference' => '747760ca8c52cc94aff432aadce7addf44c357d4',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
