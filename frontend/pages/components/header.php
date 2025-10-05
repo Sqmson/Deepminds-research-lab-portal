@@ -33,8 +33,8 @@ if (file_exists(__DIR__ . '.env')) {
 
     <div style="max-width: 1280px; margin: 0 auto; padding: 0 1rem; display: flex; justify-content: space-between; align-items: center; height: 4rem;">
         <div class="logo-section">
-            <a href="?page=lobby" class="logo-link" onclick="createRipple(event)" style="display: flex; align-items: center; space-x-3; text-decoration: none; color: #1f2937; font-weight: 600; font-size: 1.25rem;">
-                <img src="../../public/logo-7402580_1920.png" alt="Deepminds Research Lab" style="width: 2rem; height: 2rem; margin-right: 0.5rem;" loading="lazy">
+            <a data-page="lobby" class="logo-link" style="display: flex; align-items: center; space-x-3; text-decoration: none; color: #1f2937; font-weight: 600; font-size: 1.25rem;">
+                <img src="public/logo-7402580_1920.png" alt="x-icon" style="width: 2rem; height: 2rem; margin-right: 0.5rem;" loading="lazy">
                 <div style="display: flex; flex-direction: column;">
                     <h1 style="margin: 0; font-size: 1.25rem; font-weight: 600; color: #1f2937; tracking-tight;">Deepminds Research Lab</h1>
                     <span style="font-size: 0.75rem; color: #6b7280; font-weight: 500; tracking-wide;">(DMRLAb)</span>
@@ -46,13 +46,13 @@ if (file_exists(__DIR__ . '.env')) {
         <nav class="nav-desktop md:flex items-center space-x-8" style="display: flex; align-items: center; gap: 2rem;">
             <ul style="display: flex; list-style: none; margin: 0; padding: 0; gap: 2rem;">
                 <li>
-                    <a href="?page=lobby" class="nav-link" onclick="createRipple(event)">Lobby</a>
+                    <a data-page="lobby" class="nav-link">Lobby</a>
                 </li>
                 <li>
-                    <a href="?page=articles" class="nav-link" onclick="createRipple(event)">Articles</a>
+                    <a data-page="articles" class="nav-link">Articles</a>
                 </li>
                 <li>
-                    <a href="?page=videos" class="nav-link" onclick="createRipple(event)">Video</a>
+                    <a data-page="videos" class="nav-link">Video</a>
                 </li>
             </ul>
         </nav>
@@ -68,9 +68,9 @@ if (file_exists(__DIR__ . '.env')) {
     <!-- Mobile Navigation -->
     <nav id="mobileNav" class="nav-mobile" style="display: none; background: white; border-top: 1px solid #e5e7eb; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         <ul class="nav-list-mobile">
-            <li><a href="?page=lobby" class="nav-link-mobile" onclick="createRipple(event)">Lobby</a></li>
-            <li><a href="?page=articles" class="nav-link-mobile" onclick="createRipple(event)">Articles</a></li>
-            <li><a href="?page=videos" class="nav-link-mobile" onclick="createRipple(event)">Video</a></li>
+            <li><a data-page="lobby" class="nav-link-mobile">Lobby</a></li>
+            <li><a data-page="articles" class="nav-link-mobile">Articles</a></li>
+            <li><a data-page="videos" class="nav-link-mobile">Video</a></li>
         </ul>
     </nav>
 </header>
@@ -202,7 +202,7 @@ if (file_exists(__DIR__ . '.env')) {
     border-radius: 50%;
     background: rgba(37, 99, 235, 0.3);
     transform: scale(0);
-    animation: ripple-animation 0.6s linear;
+    animation: ripple-animation 0.8s linear;
     pointer-events: none;
 }
 
