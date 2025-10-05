@@ -1,0 +1,13 @@
+{
+    "name": "deepminds/research-lab",
+    "description": "DeepMinds Research Lab Portal Backend",
+    "type": "project",
+    "authors": [
+        {
+            "name": "DeepMinds Team"
+        }
+    ],
+    "require": {
+        "mongodb/mongodb": "^2.0"
+    }
+}

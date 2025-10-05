@@ -1,0 +1,16 @@
+RewriteEngine On
+
+# Handle API routes
+RewriteCond %{REQUEST_URI} ^/api/
+RewriteRule ^(.*)$ server.php [QSA,L]
+
+# Handle health check
+RewriteCond %{REQUEST_URI} ^/health$
+RewriteRule ^(.*)$ server.php [QSA,L]
+
+# Serve static files directly
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^(.*)$ - [L]
+
+# Default to server.php for all other requests
+RewriteRule ^(.*)$ server.php [QSA,L]
