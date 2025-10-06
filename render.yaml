@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: deepminds
+    env: docker
+    plan: free
+    dockerfilePath: Dockerfile
+    healthCheckPath: /index.php
+    envVars:
+      - key: MONGO_URI
+        sync: false
+      - key: MONGO_DB
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
