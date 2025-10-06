@@ -41,7 +41,7 @@ try {
     $db = connectMongoDB();
     // Only proceed if the client supports selectCollection signature (some environments may differ)
     if (method_exists($db, 'selectCollection')) {
-        $collection = $db->selectCollection('announcements');
+        $collection = $db->selectCollection('deepminds', 'announcements');
         $cursor = $collection->find([], ['sort' => ['created_at' => -1]]);
         foreach ($cursor as $doc) {
             // Convert BSON document to PHP array for template compatibility

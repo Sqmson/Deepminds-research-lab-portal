@@ -1,13 +1,64 @@
 [
-  {
-    "_id": "sample1",
-    "title": "Sample Article",
-    "excerpt": "This is a sample article created for testing.",
-    "content": "Full content of the sample article.",
-    "author": "Admin",
-    "category": "Testing",
-    "tags": ["test","sample"],
-    "image_url": "/deepminds/frontend/public/logo-7402580_1920.png",
-    "date": "2025-10-05T00:00:00+00:00"
-  }
+    {
+        "title": "clicked",
+        "excerpt": "",
+        "content": "clicker",
+        "author": "",
+        "category": "",
+        "tags": [
+            ""
+        ],
+        "image_url": "/uploads/h-1759734716-98f8278d.png",
+        "date": "2025-10-06T09:11:56+02:00",
+        "_id": "805b3397d8d7be1f2ac44aa8"
+    },
+    {
+        "title": "Sae",
+        "excerpt": "",
+        "content": "Seiko",
+        "author": "",
+        "category": "",
+        "tags": [
+            ""
+        ],
+        "image_url": "/uploads/m-1759734691-e1b39e1d.png",
+        "date": "2025-10-06T09:11:31+02:00",
+        "_id": "15b76dd93d8d4bc5c1dd99e2"
+    },
+    {
+        "title": "Test3",
+        "excerpt": "",
+        "content": "Body3",
+        "author": "",
+        "category": "",
+        "tags": [],
+        "image_url": "/uploads/testimg.eiXf-1759734628-7a74a156.png",
+        "date": "2025-10-06T09:10:28+02:00",
+        "_id": "9f579226cf7a13c53d416df5"
+    },
+    {
+        "title": "Test2",
+        "excerpt": "",
+        "content": "Body2",
+        "author": "",
+        "category": "",
+        "tags": [],
+        "image_url": "/uploads/testimg.yQlP-1759734571-ddeff188.png",
+        "date": "2025-10-06T09:09:31+02:00",
+        "_id": "5a38a2c82370b79faf75e710"
+    },
+    {
+        "_id": "sample1",
+        "title": "Sample Article",
+        "excerpt": "This is a sample article created for testing.",
+        "content": "Full content of the sample article.",
+        "author": "Admin",
+        "category": "Testing",
+        "tags": [
+            "test",
+            "sample"
+        ],
+        "image_url": "/deepminds/frontend/public/logo-7402580_1920.png",
+        "date": "2025-10-05T00:00:00+00:00"
+    }
 ]

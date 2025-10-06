@@ -7,7 +7,7 @@
 </head>
 <body>
     <h1>Upload Article</h1>
-    <form action="index.php?page=upload_article" method="post" enctype="multipart/form-data">
+    <form action="/deepminds/backend/api/upload_article.php" method="post" enctype="multipart/form-data">
         <label>Title: <input type="text" name="title" required></label><br>
         <label>Excerpt: <input type="text" name="excerpt"></label><br>
         <label>Author: <input type="text" name="author"></label><br>

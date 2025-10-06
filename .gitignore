@@ -1,11 +1,6 @@
 # dotenv files
-.env
 backend/.env
 frontend/.env
-frontend\node_modules
-backend\node_modules
-# MongoDB dumps
-dump/
 
 # Local IDE/config
 .vscode/
@@ -13,5 +8,28 @@ dump/
 # Cloudinary or other config files (if saved locally)
 cloudinary_config.js
 
+# Other sensitive files
+backend/vendor
+.htaccess
+
 # OS files
 .DS_Store
+
+# Uploaded assets and runtime data
+frontend/uploads/
+frontend/data/
+
+# Logs and temp
+*.log
+/tmp/
+
+# Environment and secret files
+.env
+.env.*
+
+# Editor / IDE
+.idea/
+*.iml
+
+# Node / JS
+node_modules/
