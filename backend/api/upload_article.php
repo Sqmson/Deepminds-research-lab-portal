@@ -1,11 +1,11 @@
 <?php
-// Article uploader: uploads images to Cloudinary when configured, inserts article
-// documents into MongoDB, and appends to frontend/data/articles.json as a local
-// fallback for environments without DB access.
+require_once __DIR__ . '/../vendor/autoload.php';
+
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 try {
+    @file_put_contents('/tmp/upload_article_debug.log', "=== start request at " . date('c') . "\n", FILE_APPEND);
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         http_response_code(405);
         echo 'Method not allowed';
@@ -33,47 +33,13 @@ try {
         if (in_array($type, $allowed)) {
             $tmpPath = $_FILES['image']['tmp_name'];
 
-            // Cloudinary config from .env
-            $cloudName = getenv('CLOUDINARY_CLOUD_NAME') ?: ($_ENV['CLOUDINARY_CLOUD_NAME'] ?? null);
-            $apiKey = getenv('CLOUDINARY_API_KEY') ?: ($_ENV['CLOUDINARY_API_KEY'] ?? null);
-            $apiSecret = getenv('CLOUDINARY_API_SECRET') ?: ($_ENV['CLOUDINARY_API_SECRET'] ?? null);
-
-            if ($cloudName && $apiKey && $apiSecret && function_exists('curl_version')) {
-                // Upload to Cloudinary using unsigned/simple REST API
-                $timestamp = time();
-                $publicId = 'articles/' . bin2hex(random_bytes(6)) . '-' . $timestamp;
-
-                // Build signature if desired (server side) - Cloudinary typically requires signed uploads
-                $paramsToSign = 'public_id=' . $publicId . '&timestamp=' . $timestamp . $apiSecret;
-                $signature = sha1($paramsToSign);
-
-                $post = [
-                    'file' => new CURLFile($tmpPath, $type, basename($_FILES['image']['name'])),
-                    'timestamp' => $timestamp,
-                    'api_key' => $apiKey,
-                    'public_id' => $publicId,
-                    'signature' => $signature
-                ];
-
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, 'https://api.cloudinary.com/v1_1/' . $cloudName . '/image/upload');
-                curl_setopt($ch, CURLOPT_POST, true);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-                $resp = curl_exec($ch);
-                $err = curl_error($ch);
-                curl_close($ch);
-
-                if ($err) {
-                    error_log('Cloudinary upload error: ' . $err);
-                } else {
-                    $json = json_decode($resp, true);
-                    if (isset($json['secure_url'])) {
-                        $cloudinaryUrl = $json['secure_url'];
-                    } else {
-                        error_log('Cloudinary unexpected response: ' . $resp);
-                    }
-                }
+            // Try Cloudinary via helper
+            @file_put_contents('/tmp/upload_article_debug.log', "trying cloudinary helper\n", FILE_APPEND);
+            require_once __DIR__ . '/../config/cloudinary.php';
+            $cloudRes = cloudinary_upload_file($tmpPath, basename($_FILES['image']['name']), 'articles');
+            @file_put_contents('/tmp/upload_article_debug.log', "cloudRes: " . json_encode($cloudRes) . "\n", FILE_APPEND);
+            if (!empty($cloudRes['success'])) {
+                $cloudinaryUrl = $cloudRes['url'];
             }
 
             // If Cloudinary didn't give a URL, fall back to local storage
@@ -93,7 +59,7 @@ try {
         }
     }
 
-    // Build article entry
+    // Build article entry (use ISO date string here; Article model will convert to BSON when inserting)
     $entry = [
         'title' => $title,
         'excerpt' => $excerpt,
@@ -102,11 +68,12 @@ try {
         'category' => $category,
         'tags' => $tags,
         'image_url' => $cloudinaryUrl ?: $fileUrl,
-        'date' => new MongoDB\BSON\UTCDateTime()
+        'date' => date(DATE_ATOM)
     ];
 
     $inserted = false;
     try {
+        @file_put_contents('/tmp/upload_article_debug.log', "about to insert into MongoDB\n", FILE_APPEND);
         // Try to insert into MongoDB using the model
         require_once __DIR__ . '/../models/Article.php';
         // The Article model expects sanitized input and will insert the document
@@ -115,6 +82,7 @@ try {
         $inserted = true;
     } catch (Throwable $e) {
         error_log('Article insert to MongoDB failed: ' . $e->getMessage());
+        @file_put_contents('/tmp/upload_article_debug.log', "mongo insert failed: " . $e->getMessage() . "\n", FILE_APPEND);
         // We'll still write to fallback JSON below
     }
 
@@ -128,10 +96,10 @@ try {
         $existing = $contents ? json_decode($contents, true) ?? [] : [];
     }
 
-    // Normalize date for JSON fallback
+    // Normalize date for JSON fallback (ensure ISO string)
     $entryForJson = $entry;
-    if ($entryForJson['date'] instanceof MongoDB\BSON\UTCDateTime) {
-        $entryForJson['date'] = date(DATE_ATOM, (int)($entryForJson['date']->toDateTime()->format('U')));
+    if (!is_string($entryForJson['date'])) {
+        $entryForJson['date'] = date(DATE_ATOM);
     }
 
     // Add an _id for fallback storage
@@ -152,6 +120,7 @@ try {
 } catch (Throwable $e) {
     http_response_code(500);
     error_log('Upload article error: ' . $e->getMessage());
+    @file_put_contents('/tmp/upload_article_debug.log', "fatal error: " . $e->getMessage() . "\n", FILE_APPEND);
     echo 'Error: ' . $e->getMessage();
     exit;
 }

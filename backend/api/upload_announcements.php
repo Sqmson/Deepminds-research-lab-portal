@@ -1,5 +1,4 @@
 <?php
-// Upload handler with improved error reporting for debugging
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
@@ -12,7 +11,7 @@ try {
     $mongoAvailable = false;
     try {
         $db = connectMongoDB();
-        $collection = $db->selectCollection('announcements');
+        $collection = $db->selectCollection('deepminds', 'announcements');
         $mongoAvailable = true;
     } catch (Throwable $connectEx) {
         // Log and continue; we'll fall back to local JSON storage
@@ -30,26 +29,40 @@ try {
 
         if (in_array($fileType, $allowedTypes)) {
             $filename = basename($_FILES['document']['name']);
-            // Save files to frontend/uploads so they're publicly accessible by the web root
-            $uploadsDir = dirname(__DIR__, 2) . '/frontend/uploads/';
-            if (!is_dir($uploadsDir)) {
-                if (!mkdir($uploadsDir, 0755, true) && !is_dir($uploadsDir)) {
+            $tmpPath = $_FILES['document']['tmp_name'];
+
+            // Try Cloudinary upload first (use raw upload if needed)
+            require_once __DIR__ . '/../config/cloudinary.php';
+            $cloudRes = cloudinary_upload_file($tmpPath, $filename, 'announcements');
+            if ($cloudRes['success']) {
+                $fileData = [
+                    'name' => $filename,
+                    'url' => $cloudRes['url'],
+                    'type' => $fileType,
+                    'provider' => 'cloudinary'
+                ];
+            } else {
+                // Fall back to local storage
+                $uploadsDir = dirname(__DIR__, 2) . '/frontend/uploads/';
+                if (!is_dir($uploadsDir) && !mkdir($uploadsDir, 0755, true) && !is_dir($uploadsDir)) {
                     throw new RuntimeException('Failed to create uploads directory: ' . $uploadsDir);
                 }
-            }
-            $targetPath = $uploadsDir . $filename;
-            if (!is_uploaded_file($_FILES['document']['tmp_name'])) {
-                throw new RuntimeException('Uploaded file missing or not a valid uploaded file.');
-            }
-            if (!move_uploaded_file($_FILES['document']['tmp_name'], $targetPath)) {
-                throw new RuntimeException('Failed to move uploaded file to: ' . $targetPath);
-            }
+                $safe = preg_replace('/[^a-zA-Z0-9-_\.]/', '-', $filename);
+                $targetPath = $uploadsDir . $safe;
+                if (!is_uploaded_file($tmpPath)) {
+                    throw new RuntimeException('Uploaded file missing or not a valid uploaded file.');
+                }
+                if (!move_uploaded_file($tmpPath, $targetPath)) {
+                    throw new RuntimeException('Failed to move uploaded file to: ' . $targetPath);
+                }
 
-            $fileData = [
-                'name' => $filename,
-                'url' => '/uploads/' . $filename,
-                'type' => $fileType
-            ];
+                $fileData = [
+                    'name' => $filename,
+                    'url' => '/uploads/' . $safe,
+                    'type' => $fileType,
+                    'provider' => 'local'
+                ];
+            }
         }
     }
     // Try to insert into DB if available, otherwise append to a JSON fallback file
@@ -57,7 +70,7 @@ try {
         $collection->insertOne([
             'title' => $title,
             'description' => $description,
-            'created_at' => new MongoDB\BSON\UTCDateTime(),
+            'created_at' => date(DATE_ATOM),
             'file' => $fileData
         ]);
     } else {
