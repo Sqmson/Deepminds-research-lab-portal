@@ -1,16 +1,24 @@
 # dotenv files
 .env
-backend/.env
-frontend/.env
+server/.env
+client/.env
 
 # MongoDB dumps
 dump/
 
 # Local IDE/config
 .vscode/
+.idea/
+
+# React build
+build/
+dist/
 
 # Cloudinary or other config files (if saved locally)
 cloudinary_config.js
+
+# Coverage reports
+coverage/
 
 # OS files
 .DS_Store
