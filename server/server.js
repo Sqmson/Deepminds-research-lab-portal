@@ -31,6 +31,8 @@ const articleRoutes = require('./routes/articles');
 app.use('/articles', articleRoutes);
 const videoRoutes = require('./routes/videos');
 app.use('/videos', videoRoutes);
+const adminRoutes = require('./routes/admin');
+app.use('/deepminds/admin', adminRoutes);
 // const videoRoute = require('./routes/video');
 // app.use('/video', videoRoute);
 

@@ -2,7 +2,7 @@
 .env
 server/.env
 client/.env
-
+server/data/
 # MongoDB dumps
 dump/
 
@@ -13,7 +13,8 @@ dump/
 # React build
 build/
 dist/
-
+client/package-lock.json
+server/package-lock.json
 # Node modules
 client/node_modules/
 server/node_modules/

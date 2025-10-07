@@ -11,6 +11,7 @@ const CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID;
 // GET /videos
 router.get('/', async (req, res) => {
   try {
+    const maxResults = req.query.maxResults || 10;
     const response = await axios.get('https://www.googleapis.com/youtube/v3/search', {
       params: {
         key: YOUTUBE_API_KEY,

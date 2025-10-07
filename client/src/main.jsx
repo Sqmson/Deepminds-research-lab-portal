@@ -8,6 +8,7 @@ import ArticleLayout from "./Pages/ArticleLayout.jsx";
 import VideoPage from "./Pages/VideoPage.jsx";
 import VideoListPage from "./Pages/VideoListePage.jsx";
 import ArticlePage from "./Pages/ArticlePage.jsx";
+import AdminPanel from "./admin/AdminPanel.jsx";
 
 const root = document.getElementById("root");
 
@@ -20,6 +21,7 @@ ReactDOM.createRoot(root).render(
         <Route path='articles/:id' element={<ArticlePage />} />
         <Route path='videos' element={<VideoListPage />} />
         <Route path='videos/:id' element={<VideoPage />} />
+        <Route path='admin' element={<AdminPanel />} />
       </Route>
     </Routes>
   </BrowserRouter>,
