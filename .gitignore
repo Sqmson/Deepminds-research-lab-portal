@@ -14,6 +14,10 @@ dump/
 build/
 dist/
 
+# Node modules
+client/node_modules/
+server/node_modules/
+
 # Cloudinary or other config files (if saved locally)
 cloudinary_config.js
 
