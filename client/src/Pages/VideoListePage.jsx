@@ -31,45 +31,45 @@ const VideoListPage = () => {
   }, [videos, searchTerm, selectedCategory]);
 
   return (
-    <div style={{ backgroundColor: '#ffffff', display: 'flex', flexDirection: 'column' }}>
+    <div className="video-list-page">
       {/* Header Section */}
-      <div style={{ backgroundColor: '#fafafa', borderBottom: '1px solid #e1e4e8', padding: '24px 0' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px', display: 'flex', gap: '20px', alignItems: 'center' }}>
-          <div style={{ flex: 1 }}>
-            <h1 style={{ margin: 0, fontSize: '1.6rem', color: '#111827' }}>Videos</h1>
-            <p style={{ margin: '6px 0 0 0', color: '#6b7280' }}>Search, filter and explore lab videos and tutorials.</p>
+      <div className="page-header">
+        <div className="header-content">
+          <div className="header-text">
+            <h1>Videos</h1>
+            <p>Search, filter and explore lab videos and tutorials.</p>
           </div>
-          <div style={{ width: '360px' }}>
+          <div className="search-container">
             <VideoSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 20px', display: 'grid', gridTemplateColumns: '1fr 320px', gap: '28px' }}>
-        <div>
-          {loading && <p style={{ textAlign: 'center', color: '#586069' }}>Loading videos…</p>}
-          {error && <p style={{ textAlign: 'center', color: '#d73a49' }}>Error: {error}</p>}
+      <div className="main-content">
+        <div className="content-area">
+          {loading && <p className="loading-message">Loading videos…</p>}
+          {error && <p className="error-message">Error: {error}</p>}
 
           {!loading && !error && (
             <>
               {filteredVideos.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '3rem', color: '#586069' }}>
-                  <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📹</div>
-                  <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', color: '#24292e' }}>No videos found</h3>
+                <div className="empty-state">
+                  <div className="empty-icon">📹</div>
+                  <h3>No videos found</h3>
                   <p>Try adjusting your search or filter criteria.</p>
                 </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <div className="videos-container">
                   {filteredVideos.map(video => (
-                    <Link key={video._id} to={`/videos/${video._id}`} style={{ textDecoration: 'none' }}>
+                    <Link key={video._id} to={`/videos/${video._id}`} className="video-link">
                       <VideoCard video={video} />
                     </Link>
                   ))}
                 </div>
               )}
 
-              <div style={{ textAlign: 'center', marginTop: '2rem', padding: '1rem', color: '#586069', fontSize: '0.9rem' }}>
+              <div className="results-count">
                 Showing {filteredVideos.length} video{filteredVideos.length !== 1 ? 's' : ''}
                 {selectedCategory !== 'All' && ` in ${selectedCategory}`}
                 {searchTerm && ` matching "${searchTerm}"`}
@@ -79,21 +79,350 @@ const VideoListPage = () => {
         </div>
 
         {/* Sidebar */}
-        <aside>
-          <div style={{ position: 'sticky', top: '20px' }}>
+        <aside className="sidebar">
+          <div className="sidebar-content">
             <VideoFilters selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
-            <div style={{ marginTop: '20px', padding: '12px', background: '#fff', borderRadius: '8px', border: '1px solid #e6e6e6' }}>
-              <h4 style={{ margin: '0 0 8px 0' }}>Summary</h4>
-              <div style={{ color: '#6b7280', fontSize: '14px' }}>
-                Total videos: <strong style={{ color: '#111827' }}>{videos.length}</strong>
+            <div className="summary-card">
+              <h4>Summary</h4>
+              <div className="summary-item">
+                Total videos: <strong>{videos.length}</strong>
               </div>
-              <div style={{ marginTop: '8px', color: '#6b7280', fontSize: '14px' }}>
-                Category: <strong style={{ color: '#111827' }}>{selectedCategory}</strong>
+              <div className="summary-item">
+                Category: <strong>{selectedCategory}</strong>
               </div>
             </div>
           </div>
         </aside>
       </div>
+
+      <style jsx>{`
+        .video-list-page {
+          background-color: #ffffff;
+          display: flex;
+          flex-direction: column;
+          min-height: 100vh;
+        }
+
+        /* Header Styles */
+        .page-header {
+          background-color: #fafafa;
+          border-bottom: 1px solid #e1e4e8;
+          padding: 24px 0;
+        }
+
+        .header-content {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 20px;
+          display: flex;
+          gap: 20px;
+          align-items: center;
+        }
+
+        .header-text {
+          flex: 1;
+        }
+
+        .header-text h1 {
+          margin: 0;
+          font-size: 1.6rem;
+          color: #111827;
+        }
+
+        .header-text p {
+          margin: 6px 0 0 0;
+          color: #6b7280;
+        }
+
+        .search-container {
+          width: 360px;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 32px 20px;
+          display: grid;
+          grid-template-columns: 1fr 320px;
+          gap: 28px;
+          flex: 1;
+        }
+
+        .content-area {
+          min-height: 400px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .loading-message {
+          text-align: center;
+          color: #586069;
+          padding: 2rem;
+        }
+
+        .error-message {
+          text-align: center;
+          color: #d73a49;
+          padding: 2rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+          text-align: center;
+          padding: 3rem;
+          color: #586069;
+          width: 100%;
+        }
+
+        .empty-icon {
+          font-size: 3rem;
+          margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+          font-size: 1.2rem;
+          margin-bottom: 0.5rem;
+          color: #24292e;
+        }
+
+        /* Videos Container */
+        .videos-container {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          width: 80%;
+          max-width: 900px;
+          margin: 0 auto;
+        }
+
+        .video-link {
+          text-decoration: none;
+          display: block;
+        }
+
+        /* Results Count */
+        .results-count {
+          text-align: center;
+          margin-top: 2rem;
+          padding: 1rem;
+          color: #586069;
+          font-size: 0.9rem;
+          width: 80%;
+          max-width: 900px;
+        }
+
+        /* Sidebar */
+        .sidebar-content {
+          position: sticky;
+          top: 20px;
+        }
+
+        .summary-card {
+          margin-top: 20px;
+          padding: 16px;
+          background: #fff;
+          border-radius: 8px;
+          border: 1px solid #e6e6e6;
+        }
+
+        .summary-card h4 {
+          margin: 0 0 12px 0;
+          font-size: 1rem;
+          color: #111827;
+        }
+
+        .summary-item {
+          color: #6b7280;
+          font-size: 14px;
+          margin-bottom: 8px;
+        }
+
+        .summary-item:last-child {
+          margin-bottom: 0;
+        }
+
+        .summary-item strong {
+          color: #111827;
+        }
+
+        /* Media Queries */
+        @media (max-width: 1024px) {
+          .main-content {
+            grid-template-columns: 1fr 280px;
+            gap: 24px;
+          }
+          
+          .search-container {
+            width: 320px;
+          }
+
+          .videos-container {
+            width: 85%;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .page-header {
+            padding: 20px 0;
+          }
+          
+          .header-content {
+            flex-direction: column;
+            gap: 16px;
+            align-items: stretch;
+          }
+          
+          .header-text {
+            text-align: center;
+          }
+          
+          .header-text h1 {
+            font-size: 1.4rem;
+          }
+          
+          .search-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+          }
+          
+          .main-content {
+            grid-template-columns: 1fr;
+            gap: 20px;
+            padding: 24px 16px;
+          }
+          
+          .sidebar-content {
+            position: static;
+          }
+          
+          .summary-card {
+            margin-top: 16px;
+          }
+          
+          .empty-state {
+            padding: 2rem 1rem;
+          }
+          
+          .empty-icon {
+            font-size: 2.5rem;
+          }
+
+          .videos-container {
+            width: 90%;
+          }
+
+          .results-count {
+            width: 90%;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .page-header {
+            padding: 16px 0;
+          }
+          
+          .header-content {
+            padding: 0 16px;
+          }
+          
+          .header-text h1 {
+            font-size: 1.3rem;
+          }
+          
+          .header-text p {
+            font-size: 0.9rem;
+          }
+          
+          .main-content {
+            padding: 20px 12px;
+            gap: 16px;
+          }
+          
+          .videos-container {
+            gap: 12px;
+            width: 95%;
+          }
+          
+          .results-count {
+            margin-top: 1.5rem;
+            padding: 0.75rem;
+            font-size: 0.85rem;
+            width: 95%;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .page-header {
+            padding: 12px 0;
+          }
+          
+          .header-content {
+            gap: 12px;
+          }
+          
+          .header-text h1 {
+            font-size: 1.2rem;
+          }
+          
+          .main-content {
+            padding: 16px 8px;
+          }
+          
+          .empty-state {
+            padding: 1.5rem 0.5rem;
+          }
+          
+          .empty-icon {
+            font-size: 2rem;
+          }
+          
+          .empty-state h3 {
+            font-size: 1.1rem;
+          }
+          
+          .empty-state p {
+            font-size: 0.9rem;
+          }
+          
+          .summary-card {
+            padding: 12px;
+          }
+          
+          .summary-card h4 {
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+          }
+          
+          .summary-item {
+            font-size: 13px;
+          }
+
+          .videos-container {
+            width: 88%;
+          }
+
+          .results-count {
+            width: 100%;
+          }
+        }
+
+        @media (max-width: 360px) {
+          .header-content {
+            padding: 0 12px;
+          }
+          
+          .main-content {
+            padding: 12px 6px;
+          }
+          
+          .header-text h1 {
+            font-size: 1.1rem;
+          }
+        }
+      `}</style>
     </div>
   );
 };
