@@ -159,14 +159,3 @@ Open your browser at the Vite dev server URL (usually `http://localhost:5173`). 
 ## Contributing
 
 Contributions are welcome. Open issues or PRs and follow repository conventions.
-
-## Local chat-log helper
-
-This repository keeps a local chat history in `copilot-chat-history.txt`. To append a chat entry in a uniform JSONL format, use the provided script:
-
-```bash
-# from repo root
-node scripts/append_chat.js "Author Name" "Your message here"
-```
-
-Each call appends a JSON line with `timestamp`, `author`, and `message`. Treat `copilot-chat-history.txt` as a local development log — do not expose it publicly with secrets.
