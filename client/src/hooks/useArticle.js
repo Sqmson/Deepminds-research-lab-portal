@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import API_BASE from '../utils/api';
+
+const API_BASE_URL = API_BASE;
 
 const useArticles = () => {
   const [articles, setArticles] = useState([]);

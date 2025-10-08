@@ -3,11 +3,10 @@ import { useParams } from "react-router-dom";
 import VideoPlayer from "../components/VideoPage/VideoPlayer";
 import VideoInfo from "../components/VideoPage/VideoInfo";
 import RelatedVideos from "../components/VideoPage/RelatedVideos";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import API_BASE from '../utils/api';
 
 const VideoPage = () => {
-  const { title } = useParams();
+  const { id } = useParams();
   const [videoData, setVideoData] = useState(null);
   const [relatedVideos, setRelatedVideos] = useState([]);
   const [error, setError] = useState(null);
@@ -18,7 +17,7 @@ const VideoPage = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`${API_BASE_URL}/videos/${title}`);
+        const res = await fetch(`${API_BASE}/videos/${id}`);
         if (!res.ok) throw new Error("Video not found");
         const data = await res.json();
         setVideoData(data);
@@ -28,21 +27,23 @@ const VideoPage = () => {
         setLoading(false);
       }
     };
-    if (title) fetchVideo();
-  }, [title]);
+    if (id) fetchVideo();
+  }, [id]);
 
   useEffect(() => {
-    // Fetch related videos (excluding current)
+    // Fetch related videos from server-side related endpoint
     const fetchRelated = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/videos`);
+        const res = await fetch(`${API_BASE}/videos/${id}/related`);
+        if (!res.ok) throw new Error('Failed to load related');
         const data = await res.json();
-        setRelatedVideos(data.filter((v) => v.title !== title).slice(0, 5));
-        // eslint-disable-next-line no-empty
-      } catch {}
+        setRelatedVideos(data || []);
+      } catch (e) {
+        // ignore
+      }
     };
-    if (title) fetchRelated();
-  }, [title]);
+    if (id) fetchRelated();
+  }, [id]);
 
   if (error) {
     return (
@@ -77,7 +78,7 @@ const VideoPage = () => {
           padding: "20px",
         }}
       >
-        <VideoPlayer videoId={videoData.title} duration={videoData.duration} />
+  <VideoPlayer videoId={videoData._id} duration={videoData.duration} />
         <div
           style={{
             display: "grid",
@@ -86,14 +87,7 @@ const VideoPage = () => {
           }}
         >
           <div>
-            <VideoInfo
-              title={videoData.title}
-              views={videoData.views}
-              likes={videoData.likes}
-              uploadDate={videoData.uploadDate}
-              dislikes={videoData.dislikes}
-              category={videoData.category}
-            />
+            <VideoInfo videoData={videoData} />
           </div>
           <RelatedVideos videos={relatedVideos} />
         </div>

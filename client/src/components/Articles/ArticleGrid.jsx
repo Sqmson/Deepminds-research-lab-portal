@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import ArticleCard from './ArticleCard';
 import { Link } from 'react-router-dom';
-const API_BASE_URL1 = import.meta.env.VITE_API_BASE_URL;
+import API_BASE from '../../utils/api';
+
+const API_BASE_URL1 = API_BASE;
 
 const ArticleList = ({ selectedCategory, searchTerm }) => {
   const [loading, setLoading] = useState(false);

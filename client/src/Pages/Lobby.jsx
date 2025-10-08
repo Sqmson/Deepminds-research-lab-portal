@@ -1,5 +1,6 @@
 import QuickNavigation from '../components/Lobby/QuickNavigation';
 import Announcements from '../components/Lobby/AnnouncementStrip';
+import ArticleGrid from '../components/Articles/ArticleGrid';
 
 const Lobby = () => {
   return (
@@ -14,11 +15,16 @@ const Lobby = () => {
         <QuickNavigation />
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+          gridTemplateColumns: '1fr 420px',
           gap: '30px',
           marginBottom: '30px'
         }}>
-          <Announcements />
+          <div>
+            <ArticleGrid />
+          </div>
+          <div>
+            <Announcements />
+          </div>
         </div>
       </div>
     </div>

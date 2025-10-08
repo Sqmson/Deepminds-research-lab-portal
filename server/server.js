@@ -2,27 +2,22 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-
-const app = express(); // ✅ define app first
-const PORT = process.env.PORT || 5000;
 const helmet = require('helmet');
 
+const app = express();
+const PORT = process.env.PORT || 8500;
+
+// Security
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
       defaultSrc: ["'self'"],
       imgSrc: ["'self'", "https://deepminds-research-lab-portal-backend.onrender.com", "data:"],
-      // add other directives as needed
     },
   })
 );
 
 // Middleware
-const allowedOrigins = [
-  'https://deepminds-research-lab-portal.onrender.com',
-  'https://deepminds-research-lab-portal-frontend.onrender.com'
-];
-
 app.use(cors());
 app.use(express.json());
 
@@ -33,22 +28,18 @@ const videoRoutes = require('./routes/videos');
 app.use('/videos', videoRoutes);
 const adminRoutes = require('./routes/admin');
 app.use('/deepminds/admin', adminRoutes);
-// const videoRoute = require('./routes/video');
-// app.use('/video', videoRoute);
+const announcementsRoutes = require('./routes/announcements');
+app.use('/announcements', announcementsRoutes);
 
-const PORT0 = process.env.PORT || 5000;
-// Server setup
-app.listen(PORT0, () => {
-  console.log(`🚀 Server running on port ${PORT0}`);
-});
-
-
-// MongoDB Connection
-mongoose.connect(process.env.MONGO_URI)
+// Connect to Mongo and start server
+mongoose
+  .connect(process.env.MONGO_URI, { dbName: process.env.DB_NAME || undefined })
   .then(() => {
     console.log('✅ MongoDB connected');
     app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
   })
-  .catch(err => {
+  .catch((err) => {
     console.error('❌ MongoDB connection error:', err.message);
+    // exit with failure code so orchestrators can detect
+    process.exit(1);
   });

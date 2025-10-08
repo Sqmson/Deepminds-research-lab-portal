@@ -1,38 +1,172 @@
-Deepminds Research Lab Portal
+DmdLab
 
-Welcome to the Deepminds Research Lab portal! This repository hosts the digital platform for the Deepminds Research Lab, a multidisciplinary academic research group led by a university professor and comprising students.
+Welcome to the DmdLab! This repository hosts the digital platform for the Deepminds Research Lab, a multidisciplinary academic research group led by a university professor and comprising students.
 
-About the Lab
+# DmdLab Portal
 
-The Deepminds Research Lab is a collaborative environment where university students engage in cutting-edge research projects under the guidance of a senior professor. Our lab foster cooperation and innovation in diverse domains of science and technology.
-Mission
+Deepminds is a full-stack web portal (MERN) that provides a collaborative platform for a university research lab. This repository contains two apps in the project root:
 
-    To advance knowledge through rigorous and collaborative research.
+- `client/` — React + Vite frontend
+- `server/` — Node.js + Express backend (API + Socket.IO)
 
-    To provide mentoring and research opportunities to talented students.
+This README explains how to set up, run, and develop the project locally. It's modelled on the Friendly project's README and tailored for Deepminds.
 
-    To build a vibrant community of young researchers committed to academic excellence and real-world impact.
+## Features
 
-Features of the Portal
+- User authentication (JWT)
+- Real-time messaging via Socket.IO
+- Post creation with file uploads (Cloudinary)
+- Follow/unfollow and notifications
+- Search and bookmarking
+- Password reset via email
 
-    Central access point for lab resources and research discussions.
+## Tech stack
 
-    Collaborative tools for communication and knowledge sharing among members.
+### Frontend (client)
+- React + Vite
+- TailwindCSS
+- React Router
+- Socket.IO client
 
-Who Can Join
+### Backend (server)
+- Node.js + Express
+- MongoDB with Mongoose
+- Socket.IO server
+- JWT-based auth, Bcrypt
+- Multer (file upload) and Cloudinary for storage
 
-Membership is open to university students who are passionate about research and eager to collaborate in a supportive academic setting.
-How to Get Involved
+## Project structure
 
-    Reach out to the lab coordinator or the leading professor via the contact information on the portal.
+```
+├── client/                 # Frontend application (Vite + React)
+│   ├── src/
+│   └── public/
+├── server/                 # Backend application (Express)
+│   ├── config/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── socket/
+│   └── utils/
+└── README.md
+```
 
-    Participate in ongoing research discussions or propose your own ideas.
+## Prerequisites
 
-    Engage with seminars, workshops, and lab meetings hosted through the portal.
+- Node.js (v14+; Node 18 recommended)
+- npm or yarn
+- A running MongoDB instance (Atlas or local)
+- Cloudinary account (for image uploads)
+- An email account/service for sending reset emails (or a service like Mailgun/SendGrid)
+- (Optional) YouTube API key if you want video-related features
 
+## Installation (local dev)
 
-For questions or more information, please contact:
+1. Clone the repository:
 
-    Professor [Dr.Richard Kimera], Lab Lead
+```bash
+git clone <repository-url>
+cd deepminds
+```
 
-    Email: [professor.email@must.ac.ug]
+2. Install server dependencies:
+
+```bash
+cd server
+npm install
+```
+
+3. Install client dependencies:
+
+```bash
+cd ../client
+npm install
+```
+
+## Environment variables
+
+Create a `.env` file in the `server/` directory and (optionally) a `.env` file in the `client/` directory. Do NOT commit real secrets to git. Below are the variable names used by the project and a short description for each.
+
+Server (`server/.env`):
+
+- MONGO_URI — MongoDB connection string (example: mongodb+srv://user:pass@cluster0.mongodb.net/<db>?retryWrites=true&w=majority)
+- DB_NAME — Optional DB name
+- YOUTUBE_API_KEY — (optional) YouTube Data API v3 key (for video features)
+- YOUTUBE_CHANNEL_ID — (optional) default channel id used by the app
+- CLOUDINARY_CLOUD_NAME — Cloudinary cloud name
+- CLOUDINARY_API_KEY — Cloudinary API key
+- CLOUDINARY_API_SECRET — Cloudinary API secret
+- JWT_SECRET — Secret used to sign JWTs
+- ADMIN_USER — Initial admin username (used by admin auth middleware)
+- ADMIN_PASS — Initial admin password
+- PORT — Port for the backend server (default: 8500)
+- NODE_ENV — Node environment (development/production)
+
+Client (`client/.env`) — Vite exposes variables starting with `VITE_`:
+
+- VITE_API_BASE — Frontend API base URL (e.g. http://localhost:8500)
+- API_BASE_URL — Some components read this directly (kept for compatibility)
+- APP_NAME — Friendly app display name
+- VITE_CLOUDINARY_CLOUD_NAME — Cloudinary cloud name used client-side for unsigned uploads (if applicable)
+
+Example (do NOT use real secrets in source):
+
+```env
+# server/.env
+MONGO_URI=your_mongo_connection_string
+JWT_SECRET=some_long_random_secret
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+PORT=8500
+
+# client/.env
+VITE_API_BASE=http://localhost:8500
+VITE_CLOUDINARY_CLOUD_NAME=your_cloud_name
+```
+
+## Running the app (development)
+
+1. Start the backend server
+
+```bash
+cd server
+npm run dev   # or `node server.js` depending on package scripts
+```
+
+2. Start the frontend dev server
+
+```bash
+cd client
+npm run dev
+```
+
+Open your browser at the Vite dev server URL (usually `http://localhost:5173`). The frontend should make API calls to the backend at `http://localhost:8500` (or whatever `VITE_API_BASE` is set to).
+
+## Production / Deployment notes
+
+- Ensure `NODE_ENV=production` and a secure `JWT_SECRET` in production.
+- Use Cloudinary or similar for uploaded assets and configure the backend to sign uploads if needed.
+- Configure CORS allowed origins in `server/server.js` or the relevant config.
+
+## Common troubleshooting
+
+- If the frontend fails to contact the API, verify `VITE_API_BASE`/`API_BASE_URL` and CORS settings in the backend.
+- If MongoDB connection fails with DNS errors for an Atlas SRV string, ensure your network/DNS is working and the URI is correct.
+- If uploads fail, double-check Cloudinary credentials and upload presets.
+
+## Contributing
+
+Contributions are welcome. Open issues or PRs and follow repository conventions.
+
+## Local chat-log helper
+
+This repository keeps a local chat history in `copilot-chat-history.txt`. To append a chat entry in a uniform JSONL format, use the provided script:
+
+```bash
+# from repo root
+node scripts/append_chat.js "Author Name" "Your message here"
+```
+
+Each call appends a JSON line with `timestamp`, `author`, and `message`. Treat `copilot-chat-history.txt` as a local development log — do not expose it publicly with secrets.
