@@ -7,17 +7,14 @@ import {
 import AdminArticles from './AdminArticles.jsx';
 import { connectSocket } from '../utils/socket';
 
-export default function AdminDashboard({ token }) {
+export default function AdminDashboard({ token, onLogout }) {
   const [activeSection, setActiveSection] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('create');
   const [currentEntity, setCurrentEntity] = useState(null);
-
-  useEffect(() => {
-    console.log('Modal state changed - showModal:', showModal, 'modalMode:', modalMode, 'currentEntity:', currentEntity);
-  }, [showModal, modalMode, currentEntity]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [formData, setFormData] = useState({ title: '', body: '', date: '' });
 
   // Data from server
   const [announcements, setAnnouncements] = useState([]);
@@ -41,9 +38,6 @@ export default function AdminDashboard({ token }) {
       setLoading(true);
       try {
         const base = import.meta.env.VITE_API_BASE || import.meta.env.API_BASE_URL;
-        console.log('API Base URL:', base);
-        console.log('VITE_API_BASE:', import.meta.env.VITE_API_BASE);
-        console.log('API_BASE_URL:', import.meta.env.API_BASE_URL);
         const headers = { 'Authorization': `Bearer ${token}` };
         const [annRes, memRes, aboutRes, artRes] = await Promise.all([
           fetch(`${base}/admin/announcements`, { headers }),
@@ -53,8 +47,9 @@ export default function AdminDashboard({ token }) {
         ]);
         setAnnouncements(await annRes.json());
         setMembers(await memRes.json());
-        setFooterElements(await aboutRes.json()); // assuming about is footer
-        setAboutContent(await aboutRes.json()[0] || {}); // first about
+        const aboutData = await aboutRes.json();
+        setFooterElements(Array.isArray(aboutData) ? aboutData : []);
+        setAboutContent(Array.isArray(aboutData) ? aboutData[0] || {} : aboutData);
         setArticles(await artRes.json());
       } catch (err) {
         console.error('Fetch error:', err);
@@ -110,33 +105,129 @@ export default function AdminDashboard({ token }) {
   }, []);
 
   const handleCreate = (section) => {
-    console.log('Opening create modal for section:', section);
     setModalMode('create');
     setCurrentEntity(null);
+    if (section === 'announcements') {
+      setFormData({ title: '', body: '', date: new Date().toISOString().split('T')[0] });
+    } else if (section === 'members') {
+      setFormData({ name: '', role: '', bio: '' });
+    } else if (section === 'footer') {
+      setFormData({ title: '', content: '' });
+    }
     setShowModal(true);
     setActiveSection(section);
   };
 
   const handleEdit = (item) => {
-    console.log('Opening edit modal for item:', item);
     setModalMode('edit');
     setCurrentEntity(item);
+    if (activeSection === 'announcements') {
+      setFormData({ title: item.title || '', body: item.body || '', date: item.date ? new Date(item.date).toISOString().split('T')[0] : '' });
+    } else if (activeSection === 'members') {
+      setFormData({ name: item.name || '', role: item.role || '', bio: item.bio || '' });
+    } else if (activeSection === 'footer') {
+      setFormData({ title: item.title || '', content: item.content || '' });
+    }
     setShowModal(true);
   };
 
-  const handleDelete = (section, id) => {
+  const handleDelete = async (section, id) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
-      switch(section) {
-        case 'announcements':
-          setAnnouncements(announcements.filter(a => a._id !== id));
-          break;
-        case 'members':
-          setMembers(members.filter(m => m._id !== id));
-          break;
-        case 'footer':
-          setFooterElements(footerElements.filter(f => f._id !== id));
-          break;
+      try {
+        const base = import.meta.env.VITE_API_BASE || import.meta.env.API_BASE_URL;
+        const headers = { 'Authorization': `Bearer ${token}` };
+        const response = await fetch(`${base}/admin/${section}/${id}`, {
+          method: 'DELETE',
+          headers
+        });
+        if (response.ok) {
+          // Update local state
+          switch(section) {
+            case 'announcements':
+              setAnnouncements(announcements.filter(a => a._id !== id));
+              break;
+            case 'members':
+              setMembers(members.filter(m => m._id !== id));
+              break;
+            case 'footer':
+              setFooterElements(footerElements.filter(f => f._id !== id));
+              break;
+          }
+          alert(`${section.slice(0, -1)} deleted successfully`);
+        } else {
+          alert(`Failed to delete ${section.slice(0, -1)}`);
+        }
+      } catch (err) {
+        console.error('Delete error:', err);
+        alert(`Error deleting ${section.slice(0, -1)}`);
       }
+    }
+  };
+
+  const handleSaveAbout = async () => {
+    try {
+      const base = import.meta.env.VITE_API_BASE || import.meta.env.API_BASE_URL;
+      const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+      const response = await fetch(`${base}/admin/about/${aboutContent._id}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(aboutContent)
+      });
+      if (response.ok) {
+        alert('About content saved successfully');
+      } else {
+        alert('Failed to save about content');
+      }
+    } catch (err) {
+      console.error('Save error:', err);
+      alert('Error saving about content');
+    }
+  };
+
+  const handleSaveModal = async () => {
+    try {
+      const base = import.meta.env.VITE_API_BASE || import.meta.env.API_BASE_URL;
+      const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+      let url, method;
+      if (modalMode === 'create') {
+        url = `${base}/admin/${activeSection}`;
+        method = 'POST';
+      } else {
+        url = `${base}/admin/${activeSection}/${currentEntity._id}`;
+        method = 'PUT';
+      }
+      const response = await fetch(url, {
+        method,
+        headers,
+        body: JSON.stringify(formData)
+      });
+      if (response.ok) {
+        const result = await response.json();
+        if (modalMode === 'create') {
+          // Update local state
+          if (activeSection === 'announcements') setAnnouncements(prev => [...prev, result]);
+          else if (activeSection === 'members') setMembers(prev => [...prev, result]);
+          else if (activeSection === 'footer') setFooterElements(prev => [...prev, result]);
+        } else {
+          // Update
+          if (activeSection === 'announcements') setAnnouncements(prev => prev.map(a => a._id === result._id ? result : a));
+          else if (activeSection === 'members') setMembers(prev => prev.map(m => m._id === result._id ? result : m));
+          else if (activeSection === 'footer') setFooterElements(prev => prev.map(f => f._id === result._id ? result : f));
+        }
+        setShowModal(false);
+        alert(`${activeSection.slice(0, -1)} ${modalMode}d successfully`);
+      } else {
+        alert(`Failed to ${modalMode} ${activeSection.slice(0, -1)}`);
+      }
+    } catch (err) {
+      console.error('Save error:', err);
+      alert(`Error ${modalMode}ing ${activeSection.slice(0, -1)}`);
+    }
+  };
+
+  const handleLogout = () => {
+    if (window.confirm('Are you sure you want to logout?')) {
+      onLogout();
     }
   };
 
@@ -203,8 +294,8 @@ export default function AdminDashboard({ token }) {
             ) : (
               data.map((item) => (
                 <tr key={item._id} className="hover:bg-gray-50">
-                  {Object.keys(item).filter(k => k !== '_id').map((key, i) => (
-                    <td key={i} className="px-6 py-4 text-sm text-gray-900">{item[key]}</td>
+                  {columns.map((col, i) => (
+                    <td key={i} className="px-6 py-4 text-sm text-gray-900">{item[col]}</td>
                   ))}
                   <td className="px-6 py-4 text-right text-sm space-x-2">
                     <button onClick={() => onEdit(item)} className="text-blue-600 hover:text-blue-800 inline-flex items-center"><Edit className="w-4 h-4 mr-1"/>Edit</button>
@@ -266,7 +357,7 @@ export default function AdminDashboard({ token }) {
               <label className="block text-sm font-medium text-gray-700 mb-2">History</label>
               <textarea value={aboutContent.history} onChange={(e)=>setAboutContent({...aboutContent, history: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="4" />
             </div>
-            <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 flex items-center"><Save className="w-4 h-4 mr-2"/>Save Changes</button>
+            <button onClick={handleSaveAbout} className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 flex items-center"><Save className="w-4 h-4 mr-2"/>Save Changes</button>
           </div>
         </div>
       );
@@ -306,7 +397,7 @@ export default function AdminDashboard({ token }) {
             ))}
             <div className="pt-4 mt-4 border-t border-gray-200">
               <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"><Settings className="w-5 h-5" /><span>Settings</span></button>
-              <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors"><LogOut className="w-5 h-5" /><span>Logout</span></button>
+              <button onClick={handleLogout} className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors"><LogOut className="w-5 h-5" /><span>Logout</span></button>
             </div>
           </nav>
         </aside>
@@ -317,6 +408,112 @@ export default function AdminDashboard({ token }) {
 
       {/* Overlay for mobile sidebar */}
       {sidebarOpen && <div className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden" onClick={() => setSidebarOpen(false)}></div>}
+
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold mb-4">{modalMode === 'create' ? 'Create' : 'Edit'} {activeSection.slice(0, -1)}</h3>
+            <div className="space-y-4">
+              {activeSection === 'announcements' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                    <input
+                      type="text"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Announcement title"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Body</label>
+                    <textarea
+                      value={formData.body}
+                      onChange={(e) => setFormData({ ...formData, body: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      rows="4"
+                      placeholder="Announcement content"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                    <input
+                      type="date"
+                      value={formData.date}
+                      onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                </>
+              )}
+              {activeSection === 'members' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Member name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                    <input
+                      type="text"
+                      value={formData.role}
+                      onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Member role"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Bio</label>
+                    <textarea
+                      value={formData.bio}
+                      onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      rows="3"
+                      placeholder="Member bio"
+                    />
+                  </div>
+                </>
+              )}
+              {activeSection === 'footer' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                    <input
+                      type="text"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Link title"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
+                    <input
+                      type="text"
+                      value={formData.content}
+                      onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Link URL or content"
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="flex justify-end space-x-2 mt-4">
+              <button onClick={() => setShowModal(false)} className="px-4 py-2 bg-gray-300 rounded">Cancel</button>
+              <button onClick={handleSaveModal} className="px-4 py-2 bg-blue-600 text-white rounded">Save</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

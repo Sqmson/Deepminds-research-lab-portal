@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 8500;
@@ -31,6 +32,15 @@ const adminRoutes = require('./routes/admin');
 app.use('/admin', adminRoutes);
 const announcementsRoutes = require('./routes/announcements');
 app.use('/announcements', announcementsRoutes);
+
+// Serve static files from the React app build directory
+app.use(express.static(path.join(__dirname, '../client/dist')));
+
+// Catch all handler: send back React's index.html file for any non-API routes
+// This enables client-side routing to work properly
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+});
 
 // Connect to Mongo and start server
 mongoose

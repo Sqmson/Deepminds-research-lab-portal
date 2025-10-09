@@ -35,10 +35,6 @@ const VideoListPage = () => {
       {/* Header Section */}
       <div className="page-header">
         <div className="header-content">
-          <div className="header-text">
-            <h1>Videos</h1>
-            <p>Search, filter and explore lab videos and tutorials.</p>
-          </div>
           <div className="search-container">
             <VideoSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
           </div>
