@@ -13,6 +13,10 @@ export default function AdminDashboard({ token }) {
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('create');
   const [currentEntity, setCurrentEntity] = useState(null);
+
+  useEffect(() => {
+    console.log('Modal state changed - showModal:', showModal, 'modalMode:', modalMode, 'currentEntity:', currentEntity);
+  }, [showModal, modalMode, currentEntity]);
   const [searchTerm, setSearchTerm] = useState('');
 
   // Data from server
@@ -37,6 +41,9 @@ export default function AdminDashboard({ token }) {
       setLoading(true);
       try {
         const base = import.meta.env.VITE_API_BASE || import.meta.env.API_BASE_URL;
+        console.log('API Base URL:', base);
+        console.log('VITE_API_BASE:', import.meta.env.VITE_API_BASE);
+        console.log('API_BASE_URL:', import.meta.env.API_BASE_URL);
         const headers = { 'Authorization': `Bearer ${token}` };
         const [annRes, memRes, aboutRes, artRes] = await Promise.all([
           fetch(`${base}/admin/announcements`, { headers }),
@@ -103,6 +110,7 @@ export default function AdminDashboard({ token }) {
   }, []);
 
   const handleCreate = (section) => {
+    console.log('Opening create modal for section:', section);
     setModalMode('create');
     setCurrentEntity(null);
     setShowModal(true);
@@ -110,6 +118,7 @@ export default function AdminDashboard({ token }) {
   };
 
   const handleEdit = (item) => {
+    console.log('Opening edit modal for item:', item);
     setModalMode('edit');
     setCurrentEntity(item);
     setShowModal(true);
