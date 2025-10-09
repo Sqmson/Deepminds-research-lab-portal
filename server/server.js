@@ -13,7 +13,7 @@ app.use(
   helmet.contentSecurityPolicy({
     directives: {
       defaultSrc: ["'self'"],
-      imgSrc: ["'self'", "https://deepminds-research-lab-portal-backend.onrender.com", "data:"],
+      imgSrc: ["'self'", "https://dmd-lab.vercel.app", "https://dmdlab.onrender.com", "data:"],
     },
   })
 );
@@ -37,7 +37,6 @@ app.use('/announcements', announcementsRoutes);
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
 // Catch all handler: send back React's index.html file for any non-API routes
-// This enables client-side routing to work properly
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });

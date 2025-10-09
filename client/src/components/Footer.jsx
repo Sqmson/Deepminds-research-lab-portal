@@ -1,4 +1,4 @@
-import { Mail, MapPin, Github } from 'lucide-react';
+import { Mail, MapPin, Github, Phone } from 'lucide-react';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -113,50 +113,71 @@ const Footer = () => {
           </div>
 
           {/* Contact Info */}
-          <div>
-            <h4 style={{
-              margin: '0 0 15px 0',
-              fontSize: '16px',
-              fontWeight: '600',
-              color: '#343a40'
-            }}>
-              Contact
-            </h4>
-            <div style={{ marginBottom: '15px' }}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                marginBottom: '10px'
-              }}>
-                <Mail style={{
-                  width: '16px',
-                  height: '16px',
-                  marginRight: '8px',
-                  marginTop: '2px',
-                  color: '#6c757d'
-                }} />
-                <div>
-                  <div style={{ color: '#495057' }}>contact@dmrlab.org</div>
-                  <div style={{ fontSize: '12px', color: '#6c757d' }}>General inquiries</div>
-                </div>
-              </div>
-              <div style={{
-                display: 'flex',
-                alignItems: 'flex-start'
-              }}>
-                <MapPin style={{
-                  width: '16px',
-                  height: '16px',
-                  marginRight: '8px',
-                  marginTop: '2px',
-                  color: '#6c757d'
-                }} />
-                <div>
-                  <div style={{ color: '#495057' }}>MUST</div>
-                  <div style={{ fontSize: '12px', color: '#6c757d' }}>Kihumuro Library Discussion Room 2</div>
-                </div>
-              </div>
-            </div>
+         <div>
+           <h4 style={{
+             margin: '0 0 15px 0',
+             fontSize: '16px',
+             fontWeight: '600',
+             color: '#343a40'
+           }}>
+             Contact
+           </h4>
+           <div style={{ marginBottom: '15px' }}>
+             <div style={{
+               display: 'flex',
+               alignItems: 'flex-start',
+               marginBottom: '10px'
+             }}>
+               <Mail style={{
+                 width: '16px',
+                 height: '16px',
+                 marginRight: '8px',
+                 marginTop: '2px',
+                 color: '#6c757d'
+               }} />
+               <div>
+                 <a href="mailto:contact@dmrlab.org" style={{ color: '#495057', textDecoration: 'none' }}>
+                   kimrichies@gmail.com
+                 </a>
+                 <div style={{ fontSize: '12px', color: '#6c757d' }}>Dr.Richard Kimera</div>
+               </div>
+             </div>
+             <div style={{
+               display: 'flex',
+               alignItems: 'flex-start',
+               marginBottom: '10px'
+             }}>
+               <Phone style={{
+                 width: '16px',
+                 height: '16px',
+                 marginRight: '8px',
+                 marginTop: '2px',
+                 color: '#6c757d'
+               }} />
+               <div>
+                 <a href="tel:+256774437989" style={{ color: '#495057', textDecoration: 'none' }}>
+                   +256 774 437989
+                 </a>
+                 <div style={{ fontSize: '12px', color: '#6c757d' }}>Dr. Richard Kimera</div>
+               </div>
+             </div>
+             <div style={{
+               display: 'flex',
+               alignItems: 'flex-start'
+             }}>
+               <MapPin style={{
+                 width: '16px',
+                 height: '16px',
+                 marginRight: '8px',
+                 marginTop: '2px',
+                 color: '#6c757d'
+               }} />
+               <div>
+                 <div style={{ color: '#495057' }}>MUST</div>
+                 <div style={{ fontSize: '12px', color: '#6c757d' }}>Kihumuro Campus</div>
+               </div>
+             </div>
+           </div>
             
             {/* Social Links */}
             <div style={{

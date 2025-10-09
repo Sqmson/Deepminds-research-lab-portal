@@ -32,15 +32,6 @@ const VideoListPage = () => {
 
   return (
     <div className="video-list-page">
-      {/* Header Section */}
-      <div className="page-header">
-        <div className="header-content">
-          <div className="search-container">
-            <VideoSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-          </div>
-        </div>
-      </div>
-
       {/* Main Content */}
       <div className="main-content">
         <div className="content-area">
