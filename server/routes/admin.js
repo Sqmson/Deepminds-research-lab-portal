@@ -19,18 +19,22 @@ router.put('/articles/:id', adminAuth, upload.single('image'), adminController.u
 router.delete('/articles/:id', adminAuth, adminController.deleteArticle);
 
 // Announcements, Members, Posts, About - generic CRUD
+router.get('/announcements', adminAuth, adminController.announcement.list);
 router.post('/announcements', adminAuth, adminController.announcement.create);
 router.put('/announcements/:id', adminAuth, adminController.announcement.update);
 router.delete('/announcements/:id', adminAuth, adminController.announcement.delete);
 
+router.get('/members', adminAuth, adminController.member.list);
 router.post('/members', adminAuth, adminController.member.create);
 router.put('/members/:id', adminAuth, adminController.member.update);
 router.delete('/members/:id', adminAuth, adminController.member.delete);
 
+router.get('/posts', adminAuth, adminController.post.list);
 router.post('/posts', adminAuth, adminController.post.create);
 router.put('/posts/:id', adminAuth, adminController.post.update);
 router.delete('/posts/:id', adminAuth, adminController.post.delete);
 
+router.get('/about', adminAuth, adminController.about.list);
 router.post('/about', adminAuth, adminController.about.create);
 router.put('/about/:id', adminAuth, adminController.about.update);
 router.delete('/about/:id', adminAuth, adminController.about.delete);

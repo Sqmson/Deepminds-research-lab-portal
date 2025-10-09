@@ -25,6 +25,7 @@ exports.getProfile = async (req, res) => {
 
 // Articles CRUD (admin)
 const { uploadStream, cloudinary } = require('../utils/cloudinary');
+const { getIo } = require('../socket');
 
 exports.createArticle = async (req, res) => {
   try {
@@ -36,6 +37,7 @@ exports.createArticle = async (req, res) => {
     }
     const newArticle = new Article(data);
     const saved = await newArticle.save();
+    try { getIo().emit('article:created', saved); } catch(e) { /* socket not ready */ }
     res.status(201).json(saved);
   } catch (err) {
     res.status(400).json({ error: 'Failed to add article', details: err.message });
@@ -57,6 +59,7 @@ exports.updateArticle = async (req, res) => {
     }
     const updated = await Article.findByIdAndUpdate(req.params.id, data, { new: true });
     if (!updated) return res.status(404).json({ error: 'Article not found' });
+  try { getIo().emit('article:updated', updated); } catch(e) { /* socket not ready */ }
     res.json(updated);
   } catch (err) {
     res.status(400).json({ error: 'Failed to update article', details: err.message });
@@ -70,6 +73,7 @@ exports.deleteArticle = async (req, res) => {
     if (removed.image_public_id) {
       try { await cloudinary.uploader.destroy(removed.image_public_id); } catch (e) { /* ignore */ }
     }
+    try { getIo().emit('article:deleted', { id: req.params.id }); } catch(e) { /* socket not ready */ }
     res.json({ success: true });
   } catch (err) {
     res.status(400).json({ error: 'Failed to delete article', details: err.message });
@@ -77,11 +81,18 @@ exports.deleteArticle = async (req, res) => {
 };
 
 // Generic CRUD for Announcement, Member, Post, About
-const makeCrud = (Model) => ({
+const makeCrud = (Model, eventPrefix) => ({
+  list: async (req, res) => {
+    try {
+      const docs = await Model.find({});
+      res.json(docs);
+    } catch (err) { res.status(400).json({ error: err.message }); }
+  },
   create: async (req, res) => {
     try {
       const doc = new Model(req.body);
       const saved = await doc.save();
+      try { getIo().emit(`${eventPrefix}:created`, saved); } catch(e) { /* socket not ready */ }
       res.status(201).json(saved);
     } catch (err) { res.status(400).json({ error: err.message }); }
   },
@@ -89,6 +100,7 @@ const makeCrud = (Model) => ({
     try {
       const updated = await Model.findByIdAndUpdate(req.params.id, req.body, { new: true });
       if (!updated) return res.status(404).json({ error: 'Not found' });
+      try { getIo().emit(`${eventPrefix}:updated`, updated); } catch(e) { /* socket not ready */ }
       res.json(updated);
     } catch (err) { res.status(400).json({ error: err.message }); }
   },
@@ -96,13 +108,13 @@ const makeCrud = (Model) => ({
     try {
       const removed = await Model.findByIdAndDelete(req.params.id);
       if (!removed) return res.status(404).json({ error: 'Not found' });
+      try { getIo().emit(`${eventPrefix}:deleted`, { id: req.params.id }); } catch(e) { /* socket not ready */ }
       res.json({ success: true });
     } catch (err) { res.status(400).json({ error: err.message }); }
   }
 });
 
-exports.announcement = makeCrud(Announcement);
-exports.member = makeCrud(Member);
-exports.post = makeCrud(Post);
-exports.about = makeCrud(About);
-exports.video = makeCrud(Video);
+exports.announcement = makeCrud(Announcement, 'announcement');
+exports.member = makeCrud(Member, 'member');
+exports.post = makeCrud(Post, 'post');
+exports.about = makeCrud(About, 'about');

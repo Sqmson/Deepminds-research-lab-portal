@@ -22,8 +22,8 @@ export default function CreateArticle({ onCreate, token }) {
 
       // perform upload here to include progress (fetch does not support progress natively; use XHR)
       await new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', `${import.meta.env.VITE_API_BASE || import.meta.env.API_BASE_URL}/deepminds/admin/articles`);
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', `${import.meta.env.VITE_API_BASE || import.meta.env.API_BASE_URL}/admin/articles`);
         if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
         xhr.upload.onprogress = (ev) => {
           if (ev.lengthComputable) setProgress(Math.round((ev.loaded / ev.total) * 100));

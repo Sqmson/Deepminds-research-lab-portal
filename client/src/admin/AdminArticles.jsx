@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { connectSocket } from '../utils/socket';
 import CreateArticle from './CreateArticle.jsx';
 
 export default function AdminArticles({ token }) {
@@ -20,10 +21,25 @@ export default function AdminArticles({ token }) {
 
   useEffect(()=>{ load(); }, []);
 
+  useEffect(()=>{
+    const socket = connectSocket();
+    const onCreated = (article) => setArticles(prev => [article, ...prev]);
+    const onUpdated = (article) => setArticles(prev => prev.map(a => a._id === article._id ? article : a));
+    const onDeleted = ({ id }) => setArticles(prev => prev.filter(a => a._id !== id));
+    socket.on('article:created', onCreated);
+    socket.on('article:updated', onUpdated);
+    socket.on('article:deleted', onDeleted);
+    return () => {
+      socket.off('article:created', onCreated);
+      socket.off('article:updated', onUpdated);
+      socket.off('article:deleted', onDeleted);
+    };
+  }, []);
+
   async function onCreate(article) {
     // POST with token
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE || import.meta.env.API_BASE_URL}/deepminds/admin/articles`, {
+  const res = await fetch(`${import.meta.env.VITE_API_BASE || import.meta.env.API_BASE_URL}/admin/articles`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(article)
@@ -44,7 +60,7 @@ export default function AdminArticles({ token }) {
     if (!confirm('Delete this article? This cannot be undone.')) return;
     setError(null);
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE || import.meta.env.API_BASE_URL}/deepminds/admin/articles/` + id, {
+  const res = await fetch(`${import.meta.env.VITE_API_BASE || import.meta.env.API_BASE_URL}/admin/articles/` + id, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -68,7 +84,7 @@ export default function AdminArticles({ token }) {
         // send multipart via XHR to preserve file content
         await new Promise((resolve, reject) => {
           const xhr = new XMLHttpRequest();
-          xhr.open('PUT', `${import.meta.env.VITE_API_BASE || import.meta.env.API_BASE_URL}/deepminds/admin/articles/` + id);
+          xhr.open('PUT', `${import.meta.env.VITE_API_BASE || import.meta.env.API_BASE_URL}/admin/articles/` + id);
           if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
           xhr.onload = () => {
             if (xhr.status >= 200 && xhr.status < 300) return resolve(JSON.parse(xhr.responseText || '{}'));
@@ -78,7 +94,7 @@ export default function AdminArticles({ token }) {
           xhr.send(body);
         });
       } else {
-        const res = await fetch(`${import.meta.env.VITE_API_BASE || import.meta.env.API_BASE_URL}/deepminds/admin/articles/` + id, {
+  const res = await fetch(`${import.meta.env.VITE_API_BASE || import.meta.env.API_BASE_URL}/admin/articles/` + id, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify(body)

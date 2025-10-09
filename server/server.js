@@ -27,7 +27,8 @@ app.use('/articles', articleRoutes);
 const videoRoutes = require('./routes/videos');
 app.use('/videos', videoRoutes);
 const adminRoutes = require('./routes/admin');
-app.use('/deepminds/admin', adminRoutes);
+// Mount admin API at /admin so the admin UI is available at https://<host>/admin
+app.use('/admin', adminRoutes);
 const announcementsRoutes = require('./routes/announcements');
 app.use('/announcements', announcementsRoutes);
 
@@ -36,7 +37,12 @@ mongoose
   .connect(process.env.MONGO_URI, { dbName: process.env.DB_NAME || undefined })
   .then(() => {
     console.log('✅ MongoDB connected');
-    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+    // use native http server so socket.io can attach
+    const http = require('http');
+    const server = http.createServer(app);
+    const { setupSocket } = require('./socket');
+    setupSocket(server);
+    server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
   })
   .catch((err) => {
     console.error('❌ MongoDB connection error:', err.message);
