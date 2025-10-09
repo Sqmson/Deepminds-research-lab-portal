@@ -4,6 +4,7 @@ const Announcement = require('../models/Announcement');
 const Member = require('../models/Member');
 const Post = require('../models/Post');
 const About = require('../models/About');
+const Video = require('../models/Video');
 
 const ADMIN_USER = process.env.ADMIN_USER || 'admin';
 const ADMIN_PASS = process.env.ADMIN_PASS || 'password';
@@ -104,3 +105,4 @@ exports.announcement = makeCrud(Announcement);
 exports.member = makeCrud(Member);
 exports.post = makeCrud(Post);
 exports.about = makeCrud(About);
+exports.video = makeCrud(Video);
