@@ -118,3 +118,4 @@ exports.announcement = makeCrud(Announcement, 'announcement');
 exports.member = makeCrud(Member, 'member');
 exports.post = makeCrud(Post, 'post');
 exports.about = makeCrud(About, 'about');
+exports.video = makeCrud(Video, 'video');
